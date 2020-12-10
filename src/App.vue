@@ -1,30 +1,53 @@
 <template>
-  <div id="nav">
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
+  <div class="w-full h-screen max-h-screen flex flex-col">
+    <Header />
+    <!-- <router-link to="/">Home</router-link> -->
+    <router-view class="self-stretch flex-grow" />
+    <transition name="snack">
+      <app-snack v-if="snack.show" />
+    </transition>
   </div>
-  <router-view />
 </template>
-
+<script lang="ts">
+import Header from "@/components/TheHeader.vue";
+import { defineAsyncComponent, defineComponent } from "vue";
+import { mapGetters } from "vuex";
+export default defineComponent({
+  computed: {
+    ...mapGetters({
+      snack: "getSnack",
+    }),
+  },
+  components: {
+    Header,
+    AppSnack: defineAsyncComponent(() => import("@/components/AppSnack.vue")),
+  },
+});
+</script>
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Source Sans Pro", Segoe UI, -apple-system, Roboto, "Noto Sans",
+    Ubuntu, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
 }
 
-#nav {
-  padding: 30px;
+.snack-enter-active {
+  animation: snack 0.2s;
 }
-
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
+.snack-leave-active {
+  animation: snack 0.2s reverse;
 }
-
-#nav a.router-link-exact-active {
-  color: #42b983;
+@keyframes snack {
+  from {
+    position: fixed;
+    opacity: 0;
+    transform: translateY(100px);
+  }
+  to {
+    position: fixed;
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 </style>

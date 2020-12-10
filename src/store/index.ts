@@ -1,8 +1,10 @@
 import { createStore } from "vuex";
+import UserInterfaceModule from "./modules/UserInterface";
+import WsModule from "./modules/WsModule";
 
 export default createStore({
-  state: {},
-  mutations: {},
-  actions: {},
-  modules: {}
+  modules: {
+    UserInterfaceModule,
+    WsModule,
+  },
 });
