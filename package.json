@@ -10,7 +10,7 @@
   "dependencies": {
     "@types/validator": "^13.1.1",
     "core-js": "^3.8.1",
-    "validator": "^13.5.1",
+    "validator": "^13.5.2",
     "vue": "^3.0.4",
     "vue-router": "^4.0.1",
     "vuex": "^4.0.0-rc.2"

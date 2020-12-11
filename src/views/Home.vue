@@ -39,12 +39,12 @@
 </template>
 
 <script lang="ts">
-import { WsClient } from "@/ws/WsClient";
-import { watch, defineAsyncComponent, defineComponent, ref } from "vue";
-import { useRouter } from "vue-router";
+import { watch, defineAsyncComponent, defineComponent, ref, inject } from "vue";
 import AppInput from "@/components/AppInput.vue";
 import GameSelector from "@/components/GameSelector.vue";
-import { useStore } from "vuex";
+// hooks
+import { WsClient } from "@/ws/WsClient";
+// import { useRouter } from "vue-router";
 
 // import escape from "validator/lib/escape";
 
@@ -68,44 +68,32 @@ export default defineComponent({
       return true;
     };
 
+    //
+    const ws = inject("ws") as WsClient;
     const isBeginDisabled = ref(false);
-    const router = useRouter();
-    const store = useStore();
-
-    const requestCreateRoom = () => {
-      // disable the request begin button
-      isBeginDisabled.value = true;
-      console.log(isBeginDisabled.value);
-      const ws = store.getters.ws as WsClient;
-      ws.initConnection({
-        store,
-        host: "localhost",
-        port: 9000,
-        path: "create",
-        params: {
-          username: username.value,
-          id: selectedGame.value.toString(),
-        },
-      })
-        .then(() => {
-          isBeginDisabled.value = false;
-          // redirect to the room route
-          router.replace({
-            name: "room",
-            params: { id: "TEST" },
-          });
-        })
-        .catch(() => {
-          isBeginDisabled.value = false;
-        });
-    };
 
     const begin = (): void => {
       if (isValidInput()) {
-        requestCreateRoom();
-        /*
-
-        */
+        // disable the begin button
+        isBeginDisabled.value = true;
+        // get the websocket class instance
+        // request a connection
+        ws.initConnection({
+          host: "localhost",
+          port: 9000,
+          path: "create",
+          params: {
+            username: username.value,
+            id: selectedGame.value.toString(),
+          },
+        })
+          .then(() => {
+            isBeginDisabled.value = false;
+            // redirect to the room route
+          })
+          .catch(() => {
+            isBeginDisabled.value = false;
+          });
       }
     };
 
