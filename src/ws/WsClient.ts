@@ -1,20 +1,19 @@
-/* READYSTATE REFERENCE
-  0	CONNECTING	Socket has been created. The connection is not yet open.
-  1	OPEN	The connection is open and ready to communicate.
-  2	CLOSING	The connection is in the process of closing.
-  3	CLOSED	The connection is closed or couldn't be opened.
-*/
 import { Store } from "vuex";
+import router from "@/router";
 
 interface InitConnectionOptions {
   host: string;
   port: number;
-  store?: Store<any>;
   path: "create" | "join";
   params: {
     username: string;
     id: string;
   };
+}
+
+interface MessageFormat {
+  event: string;
+  message?: string;
 }
 
 interface SnackOptions {
@@ -24,9 +23,9 @@ interface SnackOptions {
 
 export class WsClient {
   private _ws: WebSocket | null = null;
-  private store: Store<any> | null = null;
   private url = "";
 
+  constructor(private _store: Store<any>) {} // eslint-disable-line @typescript-eslint/no-explicit-any
   get ws(): WebSocket {
     if (!this._ws) throw new Error("Websocket not initialized");
     return this._ws;
@@ -34,54 +33,46 @@ export class WsClient {
 
   /**
    * initialize the connection to the websocket server.
-   * It Will throw an error if the the server is impossible to reach or any error is encountred while the connection is open.
-   * Additionally, the vuex store can be passed to trigger different mutations/actions in reaction to server events and messages
-   * @param store optional vuex store
    */
-  public initConnection(options: InitConnectionOptions): Promise<void> {
-    return new Promise((resolve, reject) => {
-      const { store, host, port, path, params } = options;
+  public initConnection(options: InitConnectionOptions): void {
+    const { host, port, path, params } = options;
 
-      this.url = `ws://${host}:${port}/${path}?username=${params.username}&id=${params.id}`;
-      // this will serve to trigger mutations directly from here
-      if (store) this.store = store;
-      // exception handler
-      try {
-        console.log(`Attempting to connect to ${this.url}`);
-        this._ws = new WebSocket(encodeURI(this.url));
+    this.url = `ws://${host}:${port}/${path}?username=${params.username}&id=${params.id}`;
 
-        this._ws.onopen = () => {
-          resolve();
-        };
-        // this.onOpen();
-
-        this._ws.onerror = () => {
-          reject("Could not connect to the server");
-        };
-        // this.onError();
-        this.onClose();
-        this.onMessage();
-      } catch (err) {
-        console.error(err);
-        // reject("Could not connect to the server");
-        throw new Error("Error while connection to the server.");
-      }
-    });
+    // exception handler
+    try {
+      console.log(`Attempting to connect to ${this.url}`);
+      this._ws = new WebSocket(encodeURI(this.url));
+      this.onOpen();
+      this.onError();
+      this.onClose();
+      this.onMessage();
+    } catch (err) {
+      console.error(err);
+      // reject("Could not connect to the server");
+      throw new Error("Error while connection to the server.");
+    }
   }
 
   onMessage(): void {
     if (!this._ws) throw new Error("Websocket not initialized");
     this._ws.onmessage = messageEvent => {
-      const data = JSON.parse(messageEvent.data);
-      console.log(data);
-      console.log(messageEvent);
+      const data: MessageFormat = JSON.parse(messageEvent.data);
+      const { event } = data;
+      switch (event) {
+        // * roomCreated EVENT
+        case "roomCreated":
+          this._store.dispatch("wsRoomCreated", data);
+          break;
+        // * nextEvent
+      }
     };
   }
 
   private onOpen(): void {
     if (!this._ws) throw new Error("Websocket not initialized");
     this._ws.onopen = ev => {
-      console.log("CONNECTION ESTABLISHED!", ev);
+      console.log("CONNECTION ESTABLISHED!" /*ev*/);
     };
   }
 
@@ -105,6 +96,11 @@ export class WsClient {
         message: "Disconnected from the server",
         type: "error",
       });
+      if (router.currentRoute.value.name !== "home") {
+        router.replace({
+          name: "home",
+        });
+      }
       console.error("[WsClient] onClose() =>", err);
     };
   }
@@ -115,15 +111,9 @@ export class WsClient {
    * @param type
    */
   private triggerSnack(options: SnackOptions): void {
-    if (this.store == null) {
-      console.error(
-        "Store not available. In order to use the store, it must be passed to the initConnection method"
-      );
-      return;
-    }
     const { message, type } = options;
     // properties : show, message, type
-    this.store.commit("SET_SNACK", {
+    this._store.commit("SET_SNACK", {
       show: true,
       message,
       type,
@@ -141,7 +131,14 @@ export class WsClient {
 //   };
 // }
 
-/**
+/* READYSTATE REFERENCE
+
+  0	CONNECTING	Socket has been created. The connection is not yet open.
+  1	OPEN	The connection is open and ready to communicate.
+  2	CLOSING	The connection is in the process of closing.
+  3	CLOSED	The connection is closed or couldn't be opened.
+
+
  *    onclose
      |Status Code | Meaning         | Contact       | Reference |
     -+------------+-----------------+---------------+-----------|

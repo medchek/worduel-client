@@ -8,7 +8,11 @@ interface SnackBar {
 
 @Module
 export default class UserInterface extends VuexModule {
+  // Home.uve
+  isBeginLoading = false;
+  // GameSelector.vue
   selectedGameId: number | null = null;
+  // AppSnack.vue
   snack: SnackBar = {
     show: false,
     type: "error",
@@ -21,6 +25,15 @@ export default class UserInterface extends VuexModule {
 
   get getSnack(): SnackBar {
     return this.snack;
+  }
+
+  get getIsBeginLoading(): boolean {
+    return this.isBeginLoading;
+  }
+
+  @Mutation
+  SET_IS_BEGIN_LOADING(isLoading: boolean) {
+    this.isBeginLoading = isLoading;
   }
 
   @Mutation
@@ -36,7 +49,6 @@ export default class UserInterface extends VuexModule {
     this.snack.message = message;
     this.snack.show = show;
 
-    console.log(snack);
     // auto hide snackbar
     setTimeout(() => {
       if (this.snack.show) {

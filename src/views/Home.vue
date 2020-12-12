@@ -27,26 +27,31 @@
     <button
       class="flex justify-center items-center mt-5 2xl:mt-10 mb-4 w-1/3 h-16 mx-auto text-gray-100 rounded-lg font-bold text-2xl shadow-sm hover:shadow-lg transition-all duration-200 focus:shadow-inner focus:bg-black focus:outline-none"
       :class="[
-        isBeginDisabled ? 'bg-gray-700' : 'bg-gray-900  hover:bg-gray-800',
+        isBeginLoading ? 'bg-gray-700' : 'bg-gray-900  hover:bg-gray-800',
       ]"
       @click="begin"
-      :disabled="isBeginDisabled"
+      :disabled="isBeginLoading"
     >
-      <span v-if="!isBeginDisabled">Begin</span>
-      <loader v-else size="40" />
+      <loader v-if="isBeginLoading" size="40" />
+      <span v-else>Begin</span>
     </button>
   </div>
 </template>
 
 <script lang="ts">
-import { watch, defineAsyncComponent, defineComponent, ref, inject } from "vue";
+import {
+  watch,
+  defineAsyncComponent,
+  defineComponent,
+  ref,
+  inject,
+  computed,
+} from "vue";
 import AppInput from "@/components/AppInput.vue";
 import GameSelector from "@/components/GameSelector.vue";
 // hooks
 import { WsClient } from "@/ws/WsClient";
-// import { useRouter } from "vue-router";
-
-// import escape from "validator/lib/escape";
+import { useStore } from "vuex";
 
 export default defineComponent({
   setup() {
@@ -70,12 +75,12 @@ export default defineComponent({
 
     //
     const ws = inject("ws") as WsClient;
-    const isBeginDisabled = ref(false);
+    const store = useStore();
 
     const begin = (): void => {
       if (isValidInput()) {
-        // disable the begin button
-        isBeginDisabled.value = true;
+        // start loading
+        store.commit("SET_IS_BEGIN_LOADING", true);
         // get the websocket class instance
         // request a connection
         ws.initConnection({
@@ -86,18 +91,17 @@ export default defineComponent({
             username: username.value,
             id: selectedGame.value.toString(),
           },
-        })
-          .then(() => {
-            isBeginDisabled.value = false;
-            // redirect to the room route
-          })
-          .catch(() => {
-            isBeginDisabled.value = false;
-          });
+        });
       }
     };
 
-    return { begin, username, errorMessage, isBeginDisabled, selectedGame };
+    return {
+      begin,
+      username,
+      errorMessage,
+      isBeginLoading: computed(() => store.getters.getIsBeginLoading),
+      selectedGame,
+    };
   },
   name: "Home",
   components: {
