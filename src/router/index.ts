@@ -24,6 +24,17 @@ const routes: Array<RouteRecordRaw> = [
     },
   },
   { path: "/:pathMatch(.*)*", name: "not-found", redirect: { name: "home" } },
+  // ! FOR DEVELOPMENT PHASE ONLY. MUST BE REMOVED AFTER COMPLETING THE TESTS
+  {
+    path: "/test",
+    name: "test",
+    component: () => import("../views/Room.vue"),
+    beforeEnter() {
+      console.warn(
+        "This route is for testing purposes and should be removed before building for production!"
+      );
+    },
+  },
 ];
 
 const router = createRouter({
