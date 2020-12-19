@@ -1,7 +1,7 @@
 <template>
   <section
     id="room-settings"
-    class="flex flex-col flex-grow bg-gray-100 ml-2 rounded-t-lg overflow-hidden"
+    class="flex flex-col flex-grow bg-gray-200 ml-2 rounded-t-lg overflow-hidden"
   >
     <!-- Setting Header -->
     <h1
