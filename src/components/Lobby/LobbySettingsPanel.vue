@@ -13,7 +13,7 @@
     <div id="settings-base" class="flex flex-col w-full px-4 py-2 flex-grow">
       <!-- TEXT -->
       <p class="text-lg 2xl:text-xl text-gray-500 font-semibold">
-        Give this link for your freinds to join you
+        Give this link for your friends to join you
       </p>
       <!--  INPUT SECTION -->
       <div id="link-input" class="flex w-full h-10 2xl:h-14 my-2">
