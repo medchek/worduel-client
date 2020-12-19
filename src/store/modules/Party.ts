@@ -1,5 +1,4 @@
 import { Module, Mutation, VuexModule } from "vuex-module-decorators";
-
 export interface Member {
   id: string;
   username: string;
@@ -8,27 +7,28 @@ export interface Member {
   isLeader: boolean;
 }
 
+export interface Members {
+  [playerId: string]: Member;
+}
+
 @Module
 export default class Party extends VuexModule {
-  party: Map<string, Member> = new Map();
+  party: Members = {};
   // the current player id
   playerId: string | undefined;
 
   get isPartyDataReceived(): boolean {
-    return this.party.size > 0 && this.playerId !== undefined;
+    return Object.keys(this.party).length > 0;
   }
-  get getParty(): Map<string, Member> {
+  get getParty(): Members {
     return this.party;
   }
   get getPlayer(): Member | undefined {
-    if (this.playerId) {
-      return this.party.get(this.playerId);
-    }
-    return undefined;
+    return this.playerId ? this.party[this.playerId] : undefined;
   }
 
   @Mutation
-  SET_PARTY(payload: { party: Map<string, Member>; playerId: string }) {
+  SET_PARTY(payload: { party: Members; playerId: string }) {
     const { party, playerId } = payload;
     this.party = party;
     this.playerId = playerId;
@@ -36,7 +36,7 @@ export default class Party extends VuexModule {
 
   @Mutation
   ADD_PARTY_MEMBER(player: Member) {
-    this.party.set(player.id, player);
+    this.party[player.id] = player;
   }
 
   @Mutation
@@ -46,6 +46,6 @@ export default class Party extends VuexModule {
 
   @Mutation
   GET_PARTY_MEMBER(playerId: string) {
-    return this.party.get(playerId);
+    return this.party[playerId];
   }
 }

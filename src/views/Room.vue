@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full flex items-stretch">
+  <div class="w-full flex items-stretch my-3 px-2">
     <lobby />
     <!-- players list -->
   </div>
@@ -9,7 +9,7 @@
 import Lobby from "@/components/Lobby/Lobby.vue";
 export default {
   setup() {
-    console.log("test");
+    // room
   },
   components: {
     Lobby,

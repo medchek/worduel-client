@@ -1,10 +1,16 @@
 <template>
-  <div class="w-64">Players</div>
-  <div>this is the lobby room</div>
+  <party />
+  <lobby-settings-panel />
 </template>
 
 <script>
 import { defineComponent } from "vue";
-
-export default defineComponent({});
+import Party from "../Party/Party.vue";
+import LobbySettingsPanel from "./LobbySettingsPanel.vue";
+export default defineComponent({
+  components: {
+    Party,
+    LobbySettingsPanel,
+  },
+});
 </script>

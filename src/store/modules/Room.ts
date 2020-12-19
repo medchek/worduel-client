@@ -20,6 +20,10 @@ export default class Room extends VuexModule {
     return this.gameId !== undefined && this.roomId !== undefined;
   }
 
+  get getIsLobby(): boolean {
+    return this.isLobby;
+  }
+
   @Mutation
   SET_ROOM_ID(id: string) {
     this.roomId = id;

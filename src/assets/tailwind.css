@@ -4,3 +4,27 @@
 @tailwind components;
 
 @tailwind utilities;
+
+@layer utilities {
+  .w-95\/1 {
+    width: 95%;
+  }
+  .w-98\/1 {
+    width: 98%;
+  }
+  .mr-18 {
+    margin-right: 4.5rem;
+  }
+  .mr-20 {
+    margin-right: 5rem;
+  }
+}
+
+@layer base {
+  button {
+    @apply focus:outline-none focus:ring-2 flex justify-center items-center;
+  }
+  input {
+    @apply focus:outline-none focus:ring-2;
+  }
+}
