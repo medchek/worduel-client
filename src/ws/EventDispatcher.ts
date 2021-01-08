@@ -7,7 +7,7 @@ export class EventDispatcher {
    * @param value the updated value of the setting
    */
   public updateSettings(sid: number, value: number): void {
-    const data = JSON.stringify({ sid, id: value });
+    const data = JSON.stringify({ event: "setSettings", sid, id: value });
     this.ws.send(data);
   }
 }

@@ -36,7 +36,7 @@ export class WsClient {
   }
 
   get dispatch(): EventDispatcher {
-    return this.dispatch;
+    return this._eventDispatch;
   }
 
   /**

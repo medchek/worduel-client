@@ -7,7 +7,7 @@
   </div>
 </template>
 
-<script >
+<script>
 import { defineComponent, computed } from "vue";
 import { useStore } from "vuex";
 

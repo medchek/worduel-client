@@ -43,11 +43,8 @@
       <hr class="border-none h-0.5 bg-teal-300 my-4 opacity-25" />
       <!-- SELECTS FROM -->
       <div id="select-form" class="flex flex-col flex-grow">
-        <lobby-setting
-          label="selected game"
-          :options="gameOptions"
-          @idSelected="gameSelected($event)"
-        />
+        <lobby-setting label="selected game" :options="gameOptions" />
+
         <lobby-setting
           label="difficulty"
           :options="difficulty.options"
@@ -111,17 +108,17 @@ export default defineComponent({
 
     const ws = inject("ws") as WsClient;
 
-    const gameSelected = (id: number) => {
-      console.log(id);
-    };
     const difficultySelected = (id: number) => {
-      console.log(id);
+      // console.log("selected difficulty => ", id);
+      ws.dispatch.updateSettings(1, id);
     };
     const roundSelected = (id: number) => {
-      console.log(id);
+      // console.log("selected roundCount => ", id);
+      ws.dispatch.updateSettings(2, id);
     };
     const timeSelected = (id: number) => {
-      console.log(id);
+      // console.log("selected timePerRound => ", id);
+      ws.dispatch.updateSettings(3, id);
     };
 
     const linkInputRef = ref<HTMLInputElement | null>(null);
@@ -156,7 +153,6 @@ export default defineComponent({
       linkInputRef,
       copyGameLink,
       roomUrl,
-      gameSelected,
       difficultySelected,
       roundSelected,
       timeSelected,
