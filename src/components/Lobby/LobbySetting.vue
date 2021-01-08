@@ -7,10 +7,14 @@
       </div>
       <!-- INPUT -->
       <select-input
-        :defaultSelectedId="defaultSelectedId"
+        v-if="player.isLeader && sid"
         :options="options"
+        :defaultSelectedIndex="defaultSelectedIndex"
         @idSelected="onIdSelected($event)"
+        :sid="sid"
+        :appendText="appendText"
       ></select-input>
+      <select-display :sid="sid" v-else></select-display>
       <!-- SELECT ITEMS -->
     </div>
   </div>
@@ -19,6 +23,8 @@
 <script>
 import { mdiChevronDown } from "@mdi/js";
 import { defineComponent } from "vue";
+import { mapGetters } from "vuex";
+import SelectDisplay from "./SelectDisplay.vue";
 
 import SelectInput from "./SelectInput.vue";
 
@@ -34,18 +40,31 @@ export default defineComponent({
       type: Object,
       required: true,
     },
-    defaultSelectedId: {
+    sid: {
       type: Number,
       required: false,
-      default: 1,
+      default: null,
+    },
+    defaultSelectedIndex: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
+    appendText: {
+      type: String,
+      required: false,
     },
   },
   emits: ["idSelected"],
-  components: { SelectInput },
+  components: { SelectInput, SelectDisplay },
+  computed: {
+    ...mapGetters({ player: "getPlayer" }),
+  },
   setup(props, { emit }) {
     const onIdSelected = id => {
       emit("idSelected", id);
     };
+
     return { mdiChevronDown, onIdSelected };
   },
 });

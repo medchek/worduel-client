@@ -28,7 +28,7 @@
               linkInputRef.select();
             }
           "
-          value="http://localhost:3000/join/pTYu3aY0DTvr6-hvfJGlc"
+          :value="roomUrl"
           class="flex-grow h-full rounded-lg 2xl:rounded-xl pl-4 text-teal-400 font-bold text-xl focus:ring-2 focus:ring-teal-200 shadow-sm"
         />
         <button
@@ -46,106 +46,122 @@
         <lobby-setting
           label="selected game"
           :options="gameOptions"
-          @idSelected="logId($event)"
+          @idSelected="gameSelected($event)"
         />
         <lobby-setting
           label="difficulty"
-          :options="difficultyOptions"
-          @idSelected="logId($event)"
-          :defaultSelectedId="2"
+          :options="difficulty.options"
+          @idSelected="difficultySelected($event)"
+          :defaultSelectedIndex="1"
+          :sid="difficulty.sid"
         />
 
         <lobby-setting
           label="total rounds"
-          :options="totalRoundsOptions"
-          :defaultSelectedId="3"
+          :options="roundCount.options"
+          @idSelected="roundSelected($event)"
+          :defaultSelectedIndex="2"
+          :sid="roundCount.sid"
         />
         <lobby-setting
           label="time per round"
-          :options="timePerRoundOptions"
-          :defaultSelectedId="2"
+          :options="timePerRound.options"
+          @idSelected="timeSelected($event)"
+          :defaultSelectedIndex="1"
+          :sid="timePerRound.sid"
+          appendText="sec"
         />
       </div>
       <!-- START BUTTON -->
       <button
+        v-if="player.isLeader"
         class="w-1/3 2xl:w-5/12 h-10 2xl:h-14 bg-gray-800 mx-auto text-white rounded-lg text-2xl font-bold hover:bg-gray-900 transition-colors duration-150 focus:ring-4 ring-teal-300"
       >
         start
       </button>
+      <div
+        v-else
+        class="flex justify-center items-center w-1/2 h-10 2xl:h-14 bg-gray-300 mx-auto text-gray-500 rounded-md text-lg 2xl:text-xl cursor-default font-bold"
+      >
+        Waiting for {{ leaderName }} to start the game
+      </div>
     </div>
   </section>
 </template>
 
-<script>
-import { defineComponent, ref } from "vue";
+<script lang="ts">
+import { defineComponent, inject, ref, computed } from "vue";
 import { mdiContentCopy } from "@mdi/js";
 import LobbySetting from "./LobbySetting.vue";
-import AppIcon from "../AppIcon";
+import AppIcon from "../AppIcon.vue";
+import { useStore } from "vuex";
+import { WsClient } from "@/ws/WsClient";
+import {
+  gameOptions,
+  difficulty,
+  roundCount,
+  timePerRound,
+} from "../../config/settings";
+
 export default defineComponent({
   components: { LobbySetting, AppIcon },
   setup() {
-    const gameOptions = [
-      {
-        id: 1,
-        value: "Shuffle",
-        selectable: true,
-      },
-      {
-        id: 2,
-        value: "Guess",
-        selectable: false,
-      },
-      {
-        id: 3,
-        value: "Chance",
-        selectable: false,
-      },
-    ];
-    const difficultyOptions = [
-      { id: 1, value: "easy" },
-      { id: 2, value: "normal" },
-      { id: 3, value: "hard" },
-      { id: 4, value: "very hard" },
-    ];
-    const totalRoundsOptions = [
-      { id: 1, value: 2 },
-      { id: 2, value: 4 },
-      { id: 3, value: 6 },
-      { id: 4, value: 8 },
-      { id: 5, value: 10 },
-    ];
+    const store = useStore();
+    const roomUrl = `${location.protocol}//${location.host}/join/${store.getters.getRoomId}`;
 
-    const timePerRoundOptions = [
-      { id: 1, value: "30 sec" },
-      { id: 2, value: "60 sec" },
-      { id: 3, value: "90 sec" },
-      { id: 4, value: "120 sec" },
-      { id: 5, value: "150 sec" },
-    ];
+    const ws = inject("ws") as WsClient;
 
-    const logId = id => {
+    const gameSelected = (id: number) => {
+      console.log(id);
+    };
+    const difficultySelected = (id: number) => {
+      console.log(id);
+    };
+    const roundSelected = (id: number) => {
+      console.log(id);
+    };
+    const timeSelected = (id: number) => {
       console.log(id);
     };
 
-    const linkInputRef = ref(null);
+    const linkInputRef = ref<HTMLInputElement | null>(null);
+
     const copyGameLink = () => {
-      linkInputRef.value.select();
-      linkInputRef.value.setSelectionRange(0, 99999);
-      try {
-        document.execCommand("copy");
-      } catch (err) {
-        console.error("could not copy to clipboard", err);
+      if (linkInputRef.value) {
+        linkInputRef.value.select();
+        linkInputRef.value.setSelectionRange(0, 99999);
+        try {
+          document.execCommand("copy");
+        } catch (err) {
+          console.error("could not copy to clipboard", err);
+        }
       }
     };
+    const settings = computed(() => store.getters.getSettings);
+    const player = computed(() => store.getters.getPlayer);
+    const leaderName = computed(() => {
+      const party = store.getters.getParty;
+      const leaderId = Object.keys(party).find(
+        member => party[member].isLeader === true
+      );
+      return leaderId ? party[leaderId].username : "leader";
+    });
     return {
       mdiContentCopy,
+      settings,
       gameOptions,
-      difficultyOptions,
-      totalRoundsOptions,
-      timePerRoundOptions,
-      logId,
+      difficulty,
+      roundCount,
+      timePerRound,
       linkInputRef,
       copyGameLink,
+      roomUrl,
+      gameSelected,
+      difficultySelected,
+      roundSelected,
+      timeSelected,
+      player,
+      leaderName,
     };
   },
 });

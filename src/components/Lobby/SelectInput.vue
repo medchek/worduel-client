@@ -7,7 +7,7 @@
       :id="id"
       class="select-input pl-6 text-lg font-bold w-full h-full bg-white rounded-lg cursor-pointer ring-teal-200"
       readonly
-      :value="options[selectedOptionIndex].value"
+      :value="completeDisplayValue"
       aria-readonly
       aria-expanded="false"
       @keydown.enter="openSelect"
@@ -24,14 +24,14 @@
   <select-drop
     @optionSelected="selectOption($event)"
     @closeSelectInput="closeSelect"
-    :currentlySelectedIndex="selectedOptionIndex"
+    :currentlySelectedIndex="currentlySelectedIndex"
     :options="options"
     v-if="show"
   />
 </template>
 
 <script>
-import { ref, defineAsyncComponent } from "vue";
+import { ref, defineAsyncComponent, computed } from "vue";
 import { mdiChevronDown } from "@mdi/js";
 import { defineComponent } from "vue";
 
@@ -44,15 +44,22 @@ export default defineComponent({
       required: false,
       default: null,
     },
+    sid: {
+      type: Number,
+    },
     // second pass
     options: {
-      type: Object,
+      type: Array,
       required: true,
     },
-    defaultSelectedId: {
+    defaultSelectedIndex: {
       type: Number,
       required: false,
-      default: 1,
+      default: 0,
+    },
+    appendText: {
+      type: String,
+      required: false,
     },
   },
   emits: ["idSelected"],
@@ -63,15 +70,6 @@ export default defineComponent({
   setup(props, { emit }) {
     // select options
 
-    const initSelectedOptionIndex = () => {
-      const index = props.options.findIndex(
-        entry => entry.id === props.defaultSelectedId
-      );
-      if (index) return index;
-      else return 0;
-    };
-    const selectedOptionIndex = ref(initSelectedOptionIndex());
-
     const show = ref(false);
 
     const openSelect = () => {
@@ -80,33 +78,39 @@ export default defineComponent({
     const closeSelect = () => {
       show.value = false;
     };
-    const handleOnBlur = event => {
-      // only close the options if the element that triggered the focus loss is not one of the select-options
-      // all select-options element have the first class name
-      if (event.relatedTarget) {
-        if (event.relatedTarget.classList.length > 0) {
-          const classList = event.relatedTarget.classList;
-          if (classList[0] === "select-option") {
-            return;
-          }
-        }
-      }
-      show.value = false;
-    };
+
+    // initial value is the default selected index
+    // will updated when optionSelected event is triggered
+    const currentlySelectedIndex = ref(props.defaultSelectedIndex);
+    // the display value of the input
+    const displayValue = ref(props.options[props.defaultSelectedIndex].value);
+
     // used when optionSelected event is triggered
     const selectOption = optionIndex => {
-      selectedOptionIndex.value = optionIndex;
+      // set the new display value
+      displayValue.value = props.options[optionIndex].value;
+      // set the new currently selected index
+      currentlySelectedIndex.value = optionIndex;
+      // emit parent component
       emit("idSelected", props.options[optionIndex].id);
       show.value = false;
     };
+    // display value + appendText (if any)
+    const completeDisplayValue = computed(() => {
+      if (props.appendText) {
+        return displayValue.value + ` ${props.appendText}`;
+      } else {
+        return displayValue.value;
+      }
+    });
     return {
       mdiChevronDown,
       show,
       openSelect,
       closeSelect,
       selectOption,
-      selectedOptionIndex,
-      handleOnBlur,
+      completeDisplayValue,
+      currentlySelectedIndex,
     };
   },
 });
