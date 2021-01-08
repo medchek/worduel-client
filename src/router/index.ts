@@ -23,6 +23,11 @@ const routes: Array<RouteRecordRaw> = [
       } else next();
     },
   },
+  {
+    path: "/join/:roomId",
+    name: "join",
+    component: () => import("../views/Join.vue"),
+  },
   { path: "/:pathMatch(.*)*", name: "not-found", redirect: { name: "home" } },
   // ! FOR DEVELOPMENT PHASE ONLY. MUST BE REMOVED AFTER COMPLETING THE TESTS
   {

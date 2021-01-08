@@ -55,7 +55,8 @@ import { useStore } from "vuex";
 
 export default defineComponent({
   setup() {
-    const username = ref("");
+    // const username = ref("");
+    const username = ref(process.env.NODE_ENV !== "production" ? "roleqx" : "");
     const selectedGame = ref(1);
     const errorMessage = ref("");
     // watch for input changes and update (display or hide) the error message accordingly

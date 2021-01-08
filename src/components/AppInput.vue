@@ -1,12 +1,14 @@
 <template>
-  <div class="flex flex-col w-full md:w-3/5 h-20 2xl:h-24 text-left mx-auto">
+  <div class="flex flex-col w-full lg:w-3/5 h-20 2xl:h-24 text-left mx-auto">
     <input
       placeholder="Enter a nickname"
       :value="value"
       @input="updateValue($event.target.value)"
-      class="app-input mt-2 h-full w-full bg-gray-300 bg-opacity-50 rounded-t-xl border-b-4 border-gray-800 focus:outline-none px-4 text-xl 2xl:text-2xl focus:bg-opacity-100 font-bold ring-teal-100"
+      class="app-input h-20 2xl:h-24 w-full bg-gray-300 bg-opacity-50 rounded-t-xl border-b-4 border-gray-800 focus:outline-none px-4 text-xl 2xl:text-2xl focus:bg-opacity-100 font-bold ring-teal-100"
     />
-    <div class="text-red-500 font-semibold text-sm 2xl:text-base h-10">
+    <div
+      class="text-red-500 font-semibold text-xs lg:text-sm 2xl:text-base h-10"
+    >
       <span class="shake inline-block" v-if="error">{{ error }}</span>
     </div>
   </div>

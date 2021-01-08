@@ -1,3 +1,4 @@
+import { EventDispatcher } from "./EventDispatcher";
 import { Store } from "vuex";
 import router from "@/router";
 
@@ -14,6 +15,7 @@ interface InitConnectionOptions {
 interface MessageFormat {
   event: string;
   message?: string;
+  playerId?: string;
 }
 
 interface SnackOptions {
@@ -24,11 +26,17 @@ interface SnackOptions {
 export class WsClient {
   private _ws: WebSocket | null = null;
   private url = "";
+  private _eventDispatch!: EventDispatcher;
 
-  constructor(private _store: Store<any>) {} // eslint-disable-line @typescript-eslint/no-explicit-any
+  /** eslint-disable-line @typescript-eslint/no-explicit-any */
+  constructor(private _store: Store<any>) {}
   get ws(): WebSocket {
     if (!this._ws) throw new Error("Websocket not initialized");
     return this._ws;
+  }
+
+  get dispatch(): EventDispatcher {
+    return this.dispatch;
   }
 
   /**
@@ -43,6 +51,7 @@ export class WsClient {
     try {
       console.log(`Attempting to connect to ${this.url}`);
       this._ws = new WebSocket(encodeURI(this.url));
+      this._eventDispatch = new EventDispatcher(this._ws);
       this.onOpen();
       this.onError();
       this.onClose();
@@ -53,16 +62,34 @@ export class WsClient {
       throw new Error("Error while connection to the server.");
     }
   }
-
+  /**============================================================================
+   * APP COMMUNICATION CORE
+   *==========================================================================*/
   onMessage(): void {
     if (!this._ws) throw new Error("Websocket not initialized");
     this._ws.onmessage = messageEvent => {
-      const data: MessageFormat = JSON.parse(messageEvent.data);
-      const { event } = data;
+      const message: MessageFormat = JSON.parse(messageEvent.data);
+      const { event, ...data } = message;
       switch (event) {
         // * roomCreated EVENT
         case "roomCreated":
           this._store.dispatch("wsRoomCreated", data);
+          break;
+        // * roomJoin EVENT
+        case "roomJoined":
+          this._store.dispatch("wsRoomJoined", data);
+          break;
+        // * player join party EVENT
+        case "playerJoinedParty":
+          this._store.dispatch("wsPlayerJoined", data);
+          break;
+        // * player left party EVENT
+        case "playerLeftParty":
+          this._store.dispatch("wsPlayerLeftParty", data);
+          break;
+        // * settings updated EVENT
+        case "settingsUpdated":
+          this._store.dispatch("wsSettingsUpdated", data);
           break;
         // * nextEvent
       }
@@ -71,7 +98,7 @@ export class WsClient {
 
   private onOpen(): void {
     if (!this._ws) throw new Error("Websocket not initialized");
-    this._ws.onopen = ev => {
+    this._ws.onopen = (/* event */) => {
       console.log("CONNECTION ESTABLISHED!" /*ev*/);
     };
   }
@@ -96,6 +123,7 @@ export class WsClient {
         message: "Disconnected from the server",
         type: "error",
       });
+      this._store.commit("SET_IS_BEGIN_LOADING", false);
       if (router.currentRoute.value.name !== "home") {
         router.replace({
           name: "home",

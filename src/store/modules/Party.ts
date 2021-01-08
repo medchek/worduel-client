@@ -38,6 +38,10 @@ export default class Party extends VuexModule {
   ADD_PARTY_MEMBER(player: Member) {
     this.party[player.id] = player;
   }
+  @Mutation
+  REMOVE_PARTY_MEMBER(playerId: string) {
+    delete this.party[playerId];
+  }
 
   @Mutation
   SET_PLAYER_ID(id: string) {
