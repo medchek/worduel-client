@@ -21,7 +21,7 @@ export const difficulty = {
     { id: 1, value: "easy" },
     { id: 2, value: "normal" },
     { id: 3, value: "hard" },
-    { id: 4, value: "very hard" },
+    { id: 4, value: "mixed" },
   ],
 };
 export const roundCount = {
