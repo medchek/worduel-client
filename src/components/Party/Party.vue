@@ -1,12 +1,14 @@
 <template>
   <section
-    class="flex flex-col w-56 xl:w-72 2xl:w-80 shadow-lg rounded-t-lg overflow-hidden"
+    class="flex flex-col w-56 xl:w-60 2xl:w-72 shadow-lg rounded-t-lg overflow-hidden"
   >
+    <!-- HEADER -->
     <h1
-      class="flex items-center pl-3 text-xl 2xl:text-2xl font-bold bg-teal-400 text-white h-12 2xl:h-16"
+      class="flex items-center pl-3 text-xl 2xl:text-2xl font-bold bg-teal-400 text-white h-12 2xl:h-14"
     >
       Party
     </h1>
+    <!-- BASE -->
     <div
       id="party-display"
       class="w-full border border-t-0 border-gray-200 rounded-b-sm h-full"
