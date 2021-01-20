@@ -7,6 +7,7 @@
       class="app-input h-20 2xl:h-24 w-full bg-gray-300 bg-opacity-50 rounded-t-xl border-b-4 border-gray-800 focus:outline-none px-4 text-xl 2xl:text-2xl focus:bg-opacity-100 font-bold ring-teal-100"
     />
     <div
+      v-if="!noError"
       class="text-red-500 font-semibold text-xs lg:text-sm 2xl:text-base h-10"
     >
       <span class="shake inline-block" v-if="error">{{ error }}</span>
@@ -28,6 +29,10 @@ export default defineComponent({
     error: {
       type: String,
       default: "",
+    },
+    noError: {
+      type: Boolean,
+      default: false,
     },
   },
   setup(props, { emit }) {
