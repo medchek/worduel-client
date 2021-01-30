@@ -24,31 +24,23 @@
       <!-- GAMES -->
       <game-selector @game-selected="selectedGame = $event" />
     </div>
-    <button
+    <!-- Begin button -->
+    <app-button
       class="flex justify-center items-center mt-5 2xl:mt-10 mb-4 w-1/3 h-16 mx-auto text-gray-100 rounded-lg font-bold text-2xl shadow-sm hover:shadow-lg transition-all duration-200 focus:shadow-inner focus:bg-black focus:outline-none"
-      :class="[
-        isBeginLoading ? 'bg-gray-700' : 'bg-gray-900  hover:bg-gray-800',
-      ]"
+      :class="isBeginLoading ? 'bg-gray-700' : 'bg-gray-900  hover:bg-gray-800'"
       @click="begin"
       :disabled="isBeginLoading"
+      :loading="isBeginLoading"
+      >Begin</app-button
     >
-      <loader v-if="isBeginLoading" size="40" />
-      <span v-else>Begin</span>
-    </button>
   </div>
 </template>
 
 <script lang="ts">
-import {
-  watch,
-  defineAsyncComponent,
-  defineComponent,
-  ref,
-  inject,
-  computed,
-} from "vue";
+import { watch, defineComponent, ref, inject, computed } from "vue";
 import AppInput from "@/components/AppInput.vue";
 import GameSelector from "@/components/GameSelector.vue";
+import AppButton from "@/components/AppButton.vue";
 // hooks
 import { WsClient } from "@/ws/WsClient";
 import { useStore } from "vuex";
@@ -108,7 +100,7 @@ export default defineComponent({
   components: {
     AppInput,
     GameSelector,
-    Loader: defineAsyncComponent(() => import("../components/Loader.vue")),
+    AppButton,
   },
 });
 </script>
