@@ -1,18 +1,25 @@
 <template>
   <div
     id="snackbar"
-    class="flex items-center pl-5 w-4/5 sm:w-96 xl:w-1/3 h-14 sm:h-16 absolute bottom-4 left-0 right-0 mx-auto font-bold rounded-xl border overflow-hidden"
+    class="flex items-center pl-5 w-4/5 sm:w-96 xl:w-1/3 h-14 sm:h-16 absolute bottom-4 left-0 right-0 mx-auto font-bold rounded-xl border overflow-hidden shadow-sm"
     :class="[
       snack.type === 'success'
         ? ' bg-green-200 text-green-600 border-green-300'
-        : ' bg-red-200 text-red-600 border-red-300',
+        : snack.type == 'info'
+        ? 'bg-gray-700 text-gray-100 border-gray-700'
+        : 'bg-red-200 text-red-600 border-red-300',
     ]"
   >
     <p class="flex-grow">{{ snack.message }}</p>
     <button
       @click="closeSnack"
       id="close-snackbar"
-      class="flex items-center justify-center h-full w-14 bg-red-400 hover:bg-red-600 focus:bg-red-900 focus:outline-none text-red-50 hover:text-white cursor-pointer transition-all duration-150"
+      class="flex items-center justify-center h-full w-14 focus:outline-none text-red-50 hover:text-white cursor-pointer transition-all duration-150"
+      :class="[
+        snack.type == 'error'
+          ? 'bg-red-400 hover:bg-red-600 focus:bg-red-900'
+          : 'bg-gray-800 hover:bg-gray-900 focus:bg-gray-800',
+      ]"
     >
       <app-icon :icon="mdiCloseCircleOutline" :size="30" />
     </button>
