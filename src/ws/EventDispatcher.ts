@@ -10,4 +10,17 @@ export class EventDispatcher {
     const data = JSON.stringify({ event: "setSettings", sid, id: value });
     this.ws.send(data);
   }
+  /**
+   * Request the server the start the game
+   */
+  public startGame(): void {
+    this.ws.send(JSON.stringify({ event: "start" }));
+  }
+  /**
+   * send the client answer to the server
+   * @param answer the answer
+   */
+  public answer(answer: string): void {
+    this.ws.send(JSON.stringify({ event: "answer", answer }));
+  }
 }

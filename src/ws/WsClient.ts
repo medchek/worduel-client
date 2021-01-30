@@ -16,6 +16,7 @@ interface MessageFormat {
   event: string;
   message?: string;
   playerId?: string;
+  word?: string;
 }
 
 interface SnackOptions {
@@ -90,6 +91,31 @@ export class WsClient {
         // * settings updated EVENT
         case "settingsUpdated":
           this._store.dispatch("wsSettingsUpdated", data);
+          break;
+        // * start game EVENT
+        case "start":
+          this._store.dispatch("wsStartGame", data);
+          break;
+        // * new round event
+        case "newRound":
+          this._store.dispatch("wsNewRound", data);
+          break;
+        // * timer started EVENT
+        case "timerStarted":
+          this._store.dispatch("wsTimerStarted");
+          break;
+        // * chat message EVENT
+        case "message": // recevied when client send messages/answers in the chat
+          this._store.dispatch("wsChatMessageReceived", data);
+          break;
+        // * chat rate limiting EVENT
+        case "slowDown": // recieved when client sends too many messages in a short amount of time
+          this._store.dispatch("wsChatSlowDown");
+          break;
+        // * scores EVENT
+        case "score": // received when the round ends
+          //
+          this._store.dispatch("wsAnnouceScore");
           break;
         // * nextEvent
       }

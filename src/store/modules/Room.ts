@@ -25,13 +25,22 @@ interface RoomJoinedEvent {
 @Module
 export default class Room extends VuexModule {
   isLobby = true;
-  gameId: number | undefined;
-  roomId: string | undefined;
+  gameId: number | undefined = undefined;
+  roomId: string | undefined = undefined;
   settings: RoomSettings = {
     difficulty: 2,
     timePerRound: 60,
     roundCount: 6,
   };
+  timer: number | null = null;
+  // base value is the total time per round
+  currentTime = this.settings.timePerRound;
+  currentRound = 0;
+
+  // word recived from the server that corresponds to the current word to be guessed
+  word = "Worduel";
+  // the component to load in the game room. (RoundAnnouncer, GameComponentName, or ScoreAnnouncer)
+  component = "RoundAnnouncer";
 
   get isRoomDataReceived(): boolean {
     return this.gameId !== undefined && this.roomId !== undefined;
@@ -51,6 +60,43 @@ export default class Room extends VuexModule {
 
   get getSettings(): RoomSettings {
     return this.settings;
+  }
+
+  get getTimePerRound(): number {
+    return this.settings.timePerRound;
+  }
+
+  get getCurrentTime(): number {
+    return this.currentTime;
+  }
+  get getCurrentRound(): number {
+    return this.currentRound;
+  }
+
+  get getWord(): string {
+    return this.word;
+  }
+  /**
+   * Returns the game component name based on the gameId.
+   * Defaults to Shuffler
+   */
+  get getGameComponentName(): string {
+    return this.gameId == 1
+      ? "Shuffler"
+      : this.gameId == 2
+      ? "Guess" // placeholder
+      : this.gameId == 3
+      ? "Chance" // placeholder
+      : "Shuffler"; // default
+  }
+
+  get getRoomComponent(): string {
+    return this.component;
+  }
+
+  @Mutation
+  SET_IS_LOBBY(isLobby: boolean) {
+    this.isLobby = isLobby;
   }
 
   @Mutation
@@ -77,6 +123,45 @@ export default class Room extends VuexModule {
   SET_ROUND_COUNT(value: number): void {
     this.settings.roundCount = value;
   }
+
+  @Mutation
+  SET_IS_NOT_LOBBY(): void {
+    this.isLobby = false;
+  }
+
+  @Mutation
+  NEXT_ROUND(): void {
+    this.currentRound++;
+  }
+
+  @Mutation
+  START_TIMER(): void {
+    this.timer = setInterval(() => {
+      this.currentTime--;
+      if (this.currentTime == 0) {
+        if (this.timer) clearInterval(this.timer);
+        console.log("timer stopped");
+      }
+      console.log("timer is = ", this.currentTime);
+    }, 1000);
+  }
+
+  @Mutation
+  STOP_TIMER(): void {
+    if (this.timer) clearInterval(this.timer);
+  }
+
+  @Mutation
+  SET_WORD(word: string): void {
+    this.word = word;
+  }
+
+  @Mutation
+  SET_ROOM_COMPONENT(componentName: string): void {
+    this.component = componentName;
+  }
+
+  // ACTIONS
 
   @Action
   wsRoomCreated(roomOptions: RoomCreatedEvent) {
@@ -132,8 +217,12 @@ export default class Room extends VuexModule {
   }
   // recived when a current player leaves the party
   @Action
-  wsPlayerLeftParty(data: { playerId: string }) {
+  wsPlayerLeftParty(data: { playerId: string; newLeaderId?: string }) {
     this.context.commit("REMOVE_PARTY_MEMBER", data.playerId);
+    // if the server sent a new leader id
+    if (data.newLeaderId) {
+      this.context.commit("SET_NEW_LEADER", data.newLeaderId);
+    }
   }
   // recevied when the creator of the room changes the settings of the room
   @Action
@@ -156,5 +245,43 @@ export default class Room extends VuexModule {
       default:
         break;
     }
+  }
+
+  // recevied when the game begins
+  @Action
+  wsStartGame() {
+    // load the Game.vue component by setting isLobby to false
+    this.context.commit("SET_IS_LOBBY", false);
+    console.log("[Room.wsStartGame]GAME IS STARTING NOW!");
+  }
+
+  @Action
+  wsNewRound({ word }: { word: string }) {
+    const gameComponent = this.context.getters.getRoomComponent;
+    // increment the round
+    this.context.commit("NEXT_ROUND");
+    // at the beginning of the round, set the room component to RoundAnnouncer if it is not already
+    if (gameComponent != "RoundAnnouncer")
+      this.context.commit("SET_ROOM_COMPONENT", "RoundAnnouncer");
+    // increment the round counter
+    // set the hint word
+    this.context.commit("SET_WORD", word);
+  }
+
+  @Action
+  wsTimerStarted() {
+    // load the game component at the starting of the timer
+    this.context.commit(
+      "SET_ROOM_COMPONENT",
+      this.context.getters.getGameComponentName
+    );
+    // start counting down
+    this.context.commit("START_TIMER");
+  }
+
+  @Action
+  wsDisplayScores() {
+    this.context.commit("STOP_TIMER");
+    this.context.commit("SET_ROOM_COMPONENT", "ScoreAnnouncer");
   }
 }
