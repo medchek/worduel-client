@@ -23,10 +23,39 @@
         <div
           v-for="message in chat"
           :key="message.id"
-          class="hover:bg-white px-2 py-1"
+          class="px-2 py-1 my-0.25"
+          :class="[
+            message.type == 1
+              ? 'bg-white text-teal-500 '
+              : message.type == 3
+              ? 'bg-red-100'
+              : 'hover:bg-white',
+          ]"
         >
-          <span class="font-bold text-gray-800">roleqx</span>:
-          {{ message.message }}
+          <!--        
+            type === 0 => regular message
+            type === 1 => has just found correct answer !
+            type === 2 => has already found answer 
+            type === 3 => rate limiting message
+          -->
+
+          <!-- only display if message type is not 1. 1 = player has found the answer -->
+
+          <!-- MESSAGE FROM -->
+          <span v-if="message.type == 3" class="text-red-600 font-bold"
+            >wait before sending more messages</span
+          >
+          <template v-else>
+            <span class="font-bold text-gray-700">{{ message.from }} </span>
+            <!-- MESSAGE CONTENT -->
+            <span v-if="message.type == 1" class="font-bold">
+              has found the answer!</span
+            >
+            <!-- if type = 2 (has already found the answer, change the color) -->
+            <span v-else :class="message.type == 2 ? 'text-teal-700' : ''"
+              >: {{ message.message }}
+            </span>
+          </template>
         </div>
       </div>
       <!-- SECTION CHAT INPUT  -->
@@ -60,22 +89,28 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref } from "vue";
+import { ChatMessage } from "@/store/modules/Chat";
+import { WsClient } from "@/ws/WsClient";
+import { computed, defineComponent, inject, ref } from "vue";
+import { useStore } from "vuex";
 
-interface Message {
-  message: string;
-  id: number;
-}
 export default defineComponent({
   setup() {
-    const chat = ref<Message[]>([]);
+    const store = useStore();
+    // const chat = ref<Message[]>([]);
+    const chat = (computed(
+      () => store.getters.getChat
+    ) as unknown) as ChatMessage[];
+
     const inputMessage = ref("");
     const messageCount = computed(() =>
       inputMessage.value.length <= 999 ? inputMessage.value.length : 999
     );
 
     const chatRef = ref<HTMLElement | null>(null);
-
+    /**
+     * Move the scrollbar of the chat at the very bottom when sending a new message
+     */
     const scrollChat = () => {
       // scroll back to the bottom upon sending a new message
       if (chatRef.value) {
@@ -89,14 +124,16 @@ export default defineComponent({
         }
       }
     };
+    const ws = inject("ws") as WsClient;
+    /**
+     * send an answer to the server
+     */
     const answer = () => {
       if (!inputMessage.value) return;
-      // emulate latency
-      setTimeout(() => {
-        chat.value.unshift({ message: inputMessage.value, id: Date.now() });
-        scrollChat();
-        inputMessage.value = "";
-      }, 100);
+      ws.dispatch.answer(inputMessage.value);
+      // scroll the chat to the bottom after sending a message
+      scrollChat();
+      inputMessage.value = "";
     };
 
     return { chat, inputMessage, messageCount, answer, chatRef };
@@ -105,6 +142,10 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.my-0\.25 {
+  margin-top: 0.1rem;
+  margin-bottom: 0.1rem;
+}
 #chat-messages {
   flex: 1 1 auto;
   height: 0;
