@@ -1,7 +1,7 @@
 <template>
   <!-- <svg style="width: 24px; height: 24px" viewBox="0 0 24 24"> -->
   <svg :style="{ width: `${size}px`, height: `${size}px` }" viewBox="0 0 24 24">
-    <path fill="#000" class="fill-current" :d="icon" />
+    <path fill="currentColor" class="fill-current" :d="icon" />
   </svg>
 </template>
 
