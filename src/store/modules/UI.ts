@@ -1,6 +1,7 @@
 import { Module, Mutation, VuexModule } from "vuex-module-decorators";
 
 interface SnackBar {
+  timeout: number | null;
   show: boolean;
   type?: string;
   message: string;
@@ -14,6 +15,7 @@ export default class UserInterface extends VuexModule {
   selectedGameId: number | null = null;
   // AppSnack.vue
   snack: SnackBar = {
+    timeout: null,
     show: false,
     type: "error",
     message: "",
@@ -43,22 +45,22 @@ export default class UserInterface extends VuexModule {
 
   @Mutation
   SET_SNACK(snack: SnackBar) {
-    const { type, message, show } = snack;
+    if (this.snack.timeout) clearTimeout(this.snack.timeout);
+    const { type, message } = snack;
 
     this.snack.type = type || "error";
     this.snack.message = message;
-    this.snack.show = show;
+    this.snack.show = true;
 
     // auto hide snackbar
-    setTimeout(() => {
+    this.snack.timeout = setTimeout(() => {
       if (this.snack.show) {
         // hide and reset the message after the timeout
         this.snack.show = false;
         this.snack.message = "";
       }
-    }, 4000);
+    }, 3000);
   }
-
   @Mutation
   CLOSE_SNACK() {
     this.snack.show = false;
