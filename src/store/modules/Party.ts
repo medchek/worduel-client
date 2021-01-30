@@ -27,11 +27,22 @@ export default class Party extends VuexModule {
     return this.playerId ? this.party[this.playerId] : undefined;
   }
 
+  get getPartyLength(): number {
+    return Object.keys(this.party).length;
+  }
+
   @Mutation
   SET_PARTY(payload: { party: Members; playerId: string }) {
     const { party, playerId } = payload;
     this.party = party;
     this.playerId = playerId;
+  }
+
+  @Mutation
+  SET_NEW_LEADER(newLeaderId: string): void {
+    if (Object.keys(this.party).includes(newLeaderId)) {
+      this.party[newLeaderId].isLeader = true;
+    }
   }
 
   @Mutation
@@ -49,7 +60,7 @@ export default class Party extends VuexModule {
   }
 
   @Mutation
-  GET_PARTY_MEMBER(playerId: string) {
+  GET_PARTY_MEMBER(playerId: string): Member {
     return this.party[playerId];
   }
 }
