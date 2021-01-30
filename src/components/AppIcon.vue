@@ -15,7 +15,7 @@ export default defineComponent({
       required: true,
     },
     size: {
-      type: Number || String,
+      type: [Number, String],
       default: 24,
     },
   },

@@ -23,7 +23,7 @@ export default defineComponent({
       default: false,
     },
     loaderSize: {
-      type: String || Number,
+      type: [String, Number],
       required: false,
       default: "40",
     },
