@@ -70,12 +70,17 @@
         />
       </div>
       <!-- START BUTTON -->
-      <button
+      <!-- leader display -->
+      <app-button
+        :title="startBtnTitle"
         v-if="player.isLeader"
+        :loading="isBtnLoading"
+        @click="requestGameStart"
         class="w-1/3 2xl:w-5/12 h-10 2xl:h-14 bg-gray-800 mx-auto text-white rounded-lg text-2xl font-bold hover:bg-gray-900 transition-colors duration-150 focus:ring-4 ring-teal-300"
       >
         start
-      </button>
+      </app-button>
+      <!-- not leader display-->
       <div
         v-else
         class="flex justify-center items-center w-1/2 h-10 2xl:h-14 bg-gray-300 mx-auto text-gray-500 rounded-md text-lg 2xl:text-xl cursor-default font-bold"
@@ -89,10 +94,14 @@
 <script lang="ts">
 import { defineComponent, inject, ref, computed } from "vue";
 import { mdiContentCopy } from "@mdi/js";
-import LobbySetting from "./LobbySetting.vue";
-import AppIcon from "../AppIcon.vue";
+
 import { useStore } from "vuex";
 import { WsClient } from "@/ws/WsClient";
+// components
+import AppIcon from "../AppIcon.vue";
+import LobbySetting from "./LobbySetting.vue";
+import AppButton from "@/components/AppButton.vue";
+
 import {
   gameOptions,
   difficulty,
@@ -101,7 +110,7 @@ import {
 } from "../../config/settings";
 
 export default defineComponent({
-  components: { LobbySetting, AppIcon },
+  components: { LobbySetting, AppIcon, AppButton },
   setup() {
     const store = useStore();
     const roomUrl = `${location.protocol}//${location.host}/join/${store.getters.getRoomId}`;
@@ -136,6 +145,12 @@ export default defineComponent({
     };
     const settings = computed(() => store.getters.getSettings);
     const player = computed(() => store.getters.getPlayer);
+    const startBtnTitle = computed(() => {
+      return store.getters.getPartyLength > 1
+        ? "start the game"
+        : "More players are needed to start the game";
+    });
+
     const leaderName = computed(() => {
       const party = store.getters.getParty;
       const leaderId = Object.keys(party).find(
@@ -143,6 +158,19 @@ export default defineComponent({
       );
       return leaderId ? party[leaderId].username : "leader";
     });
+
+    const isBtnLoading = ref(false);
+    const requestGameStart = () => {
+      if (store.getters.getPartyLength > 1) {
+        isBtnLoading.value = true;
+        ws.dispatch.startGame();
+      } else {
+        store.commit("SET_SNACK", {
+          type: "info",
+          message: "More players are needed to start the game",
+        });
+      }
+    };
     return {
       mdiContentCopy,
       settings,
@@ -158,6 +186,9 @@ export default defineComponent({
       timeSelected,
       player,
       leaderName,
+      startBtnTitle,
+      requestGameStart,
+      isBtnLoading,
     };
   },
 });
