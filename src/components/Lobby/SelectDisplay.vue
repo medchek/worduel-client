@@ -34,6 +34,8 @@ export default defineComponent({
           return store.getters.getSettings.roundCount;
         } else if (props.sid == 3) {
           return `${store.getters.getSettings.timePerRound} sec`;
+        } else {
+          return null;
         }
       } else {
         return gameOptions.find(option => option.id == store.getters.getGameId)
