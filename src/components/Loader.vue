@@ -22,7 +22,7 @@ import { defineComponent } from "vue";
 export default defineComponent({
   props: {
     size: {
-      type: String || Number,
+      type: [String, Number],
       default: "20",
     },
     thickness: {
@@ -83,10 +83,4 @@ export default defineComponent({
     stroke-dashoffset: -124px;
   }
 }
-/* .loader {
-  border-radius: 50%;
-  border: 4px solid #fff;
-  border-color: #fff transparent #fff #fff;
-  animation: spin 1s ease-in-out infinite;
-} */
 </style>
