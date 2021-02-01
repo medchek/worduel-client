@@ -1,7 +1,7 @@
 <template>
   <!-- DISPLAYED FOR NON-LEADER PLAYERS -->
   <div
-    class="h-full flex-grow flex items-center relative bg-gray-400 bg-opacity-50 text-gray-700 mr-18 rounded-lg pl-5 font-bold text-xl"
+    class="h-full flex-grow flex items-center relative bg-gray-400 bg-opacity-50 text-gray-700 mr-18 rounded-lg pl-5 font-bold text-lg 2xl:text-xl"
   >
     {{ selectDisplayValue }}
   </div>

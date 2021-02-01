@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col w-full relative mb-8">
-    <div class="flex h-12 2xl:h-14 items-center w-full">
+    <div class="flex h-10 2xl:h-14 items-center w-full">
       <!-- LABEL DIV -->
       <div class="text-gray-800 text-lg 2xl:text-xl font-bold w-60">
         <label for="select-game" class="capitalize">{{ label }}</label>
