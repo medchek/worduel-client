@@ -39,7 +39,13 @@ export default defineComponent({
 
     const setSelectedGame = (id: number): void => {
       const isAvailable = games.find(game => game.id === id);
-      if (!isAvailable) return;
+      if (!isAvailable?.available) {
+        store.commit("SET_SNACK", {
+          type: "info",
+          message: "This game is not available yet",
+        });
+        return;
+      }
       selectedGame.value = id;
       emit("game-selected", id);
       store.commit("SET_SELECTED_GAME", id);
