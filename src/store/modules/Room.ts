@@ -1,4 +1,4 @@
-import { Member } from "./Party";
+import { Member, Members } from "./Party";
 import { Module, Mutation, VuexModule, Action } from "vuex-module-decorators";
 import router from "../../router";
 interface RoomCreatedEvent {
@@ -32,6 +32,7 @@ export interface RoundScore {
   [playerName: string]: number;
 }
 export interface PlayerScore {
+  id: string;
   username: string;
   score: number;
 }
@@ -50,13 +51,15 @@ export default class Room extends VuexModule {
   // base value is the total time per round
   currentTime = this.settings.timePerRound;
   currentRound = 0;
-  roundScore: RoundScore | null = null;
+  roundScore: PlayerScore[] | null = null;
 
   // word recived from the server that corresponds to the current word to be guessed
   word = "";
   // the component to load in the game room. (RoundAnnouncer, GameComponentName, or ScoreAnnouncer)
   component = "RoundAnnouncer";
   // component = "ScoreAnnouncer"; // ! FIXME REMOVE THIS AFTER TESTING
+
+  gameEnded = false;
 
   get isRoomDataReceived(): boolean {
     return this.gameId !== undefined && this.roomId !== undefined;
@@ -93,8 +96,12 @@ export default class Room extends VuexModule {
     return this.word;
   }
 
-  get getRoundScore(): RoundScore | null {
+  get getRoundScore(): PlayerScore[] | null {
     return this.roundScore;
+  }
+
+  get getGameEnded(): boolean {
+    return this.gameEnded;
   }
 
   /**
@@ -113,6 +120,19 @@ export default class Room extends VuexModule {
 
   get getRoomComponent(): string {
     return this.component;
+  }
+
+  get getFinalScores(): PlayerScore[] {
+    const party: Members = this.context.rootGetters.getParty;
+    const scores: PlayerScore[] = [];
+    for (const player in party) {
+      scores.push({
+        id: party[player].id,
+        username: party[player].username,
+        score: party[player].score,
+      });
+    }
+    return scores.sort((a, b) => b.score - a.score);
   }
 
   /**
@@ -197,7 +217,7 @@ export default class Room extends VuexModule {
   }
 
   @Mutation
-  SET_ROUND_SCORE(scores: RoundScore): void {
+  SET_ROUND_SCORE(scores: PlayerScore[]): void {
     this.roundScore = scores;
   }
 
@@ -213,6 +233,11 @@ export default class Room extends VuexModule {
   @Mutation
   RESET_ROUND_SCORE(): void {
     this.roundScore = null;
+  }
+
+  @Mutation
+  SET_GAME_ENDED(ended = true) {
+    this.gameEnded = ended;
   }
 
   // ACTIONS
@@ -391,6 +416,7 @@ export default class Room extends VuexModule {
     for (const [playerId, score] of Object.entries(rawScores)) {
       const playerName: string = party[playerId].username;
       scores.push({
+        id: playerId,
         username: playerName,
         score,
       });
@@ -414,6 +440,8 @@ export default class Room extends VuexModule {
   @Action
   wsGameEnded() {
     // display the final scores
+    this.context.commit("SET_GAME_ENDED");
+    this.context.commit("SET_GAME_COMPONENT", "ScoreAnnouncer");
     console.warn("GAME ENDED!");
   }
 }
