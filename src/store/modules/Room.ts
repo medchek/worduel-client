@@ -20,6 +20,16 @@ interface RoomJoinedEvent {
     [key: string]: Member;
   };
   settings?: RoomSettings;
+  // if game has started
+  word?: string;
+  roundPhase?: number; // 1 = before timer start,2 = during round when timer is started, 3 = on roud end/score announcing phase
+  remainingTime?: number;
+  round?: number;
+  scores?: { [payerId: string]: number };
+}
+
+export interface RoundScore {
+  [playerName: string]: number;
 }
 
 @Module
@@ -36,11 +46,13 @@ export default class Room extends VuexModule {
   // base value is the total time per round
   currentTime = this.settings.timePerRound;
   currentRound = 0;
+  roundScore: RoundScore | null = null;
 
   // word recived from the server that corresponds to the current word to be guessed
-  word = "Worduel";
+  word = "";
   // the component to load in the game room. (RoundAnnouncer, GameComponentName, or ScoreAnnouncer)
   component = "RoundAnnouncer";
+  // component = "ScoreAnnouncer"; // ! FIXME REMOVE THIS AFTER TESTING
 
   get isRoomDataReceived(): boolean {
     return this.gameId !== undefined && this.roomId !== undefined;
@@ -76,6 +88,11 @@ export default class Room extends VuexModule {
   get getWord(): string {
     return this.word;
   }
+
+  get getRoundScore(): RoundScore | null {
+    return this.roundScore;
+  }
+
   /**
    * Returns the game component name based on the gameId.
    * Defaults to Shuffler
@@ -94,6 +111,10 @@ export default class Room extends VuexModule {
     return this.component;
   }
 
+  /**
+   * When isLobby is false, the game view is loaded
+   * @param isLobby a boolean
+   */
   @Mutation
   SET_IS_LOBBY(isLobby: boolean) {
     this.isLobby = isLobby;
@@ -117,11 +138,17 @@ export default class Room extends VuexModule {
   @Mutation
   SET_TIME_PER_ROUND(value: number): void {
     this.settings.timePerRound = value;
+    this.currentTime = value;
   }
 
   @Mutation
   SET_ROUND_COUNT(value: number): void {
     this.settings.roundCount = value;
+  }
+
+  @Mutation
+  SET_REMAINING_TIME(seconds: number) {
+    this.currentTime = seconds;
   }
 
   @Mutation
@@ -133,6 +160,10 @@ export default class Room extends VuexModule {
   NEXT_ROUND(): void {
     this.currentRound++;
   }
+  @Mutation
+  SET_ROUND(round: number): void {
+    this.currentRound = round;
+  }
 
   @Mutation
   START_TIMER(): void {
@@ -142,7 +173,7 @@ export default class Room extends VuexModule {
         if (this.timer) clearInterval(this.timer);
         console.log("timer stopped");
       }
-      console.log("timer is = ", this.currentTime);
+      // console.log("timer is = ", this.currentTime);
     }, 1000);
   }
 
@@ -157,8 +188,27 @@ export default class Room extends VuexModule {
   }
 
   @Mutation
-  SET_ROOM_COMPONENT(componentName: string): void {
+  SET_GAME_COMPONENT(componentName: string): void {
     this.component = componentName;
+  }
+
+  @Mutation
+  SET_ROUND_SCORE(scores: RoundScore): void {
+    this.roundScore = scores;
+  }
+
+  /** Reset the whole round related data, to prepare for the next round */
+  @Mutation
+  RESET_ROUND_STATE(): void {
+    // nullify the timer state
+    this.timer = null;
+    // reset the round timer
+    this.currentTime = this.settings.timePerRound;
+  }
+
+  @Mutation
+  RESET_ROUND_SCORE(): void {
+    this.roundScore = null;
   }
 
   // ACTIONS
@@ -192,7 +242,19 @@ export default class Room extends VuexModule {
   // recives up successful party join
   @Action
   wsRoomJoined(roomOptions: RoomJoinedEvent) {
-    const { gameId, playerId, roomId, party, settings } = roomOptions;
+    const {
+      gameId,
+      playerId,
+      roomId,
+      party,
+      settings,
+      remainingTime,
+      roundPhase,
+      word,
+      round,
+      scores,
+    } = roomOptions;
+
     this.context.commit("SET_GAME_ID", gameId);
     this.context.commit("SET_PLAYER_ID", playerId); // found in party.ts module
     this.context.commit("SET_ROOM_ID", roomId);
@@ -205,6 +267,34 @@ export default class Room extends VuexModule {
     }
     // set the party with the data given by the server
     this.context.commit("SET_PARTY", { party, playerId });
+    // if the roudPhase is includes in the data, the game has already started
+    if (roundPhase) {
+      // display the Game view
+      this.context.commit("SET_IS_LOBBY", false);
+      // set the word to guess
+      this.context.commit("SET_WORD", word);
+      // only increment the round if it wasnt set yet
+      if (this.context.getters.getCurrentRound == 0) {
+        this.context.commit("SET_ROUND", round);
+      }
+      // depending on the phase, load different components
+      // phase 1 = RoundAnnouncer which is set by default, hence not changing it
+
+      // if the round is ongoing
+      if (roundPhase == 2) {
+        this.context.commit("SET_REMAINING_TIME", remainingTime);
+        this.context.commit(
+          "SET_GAME_COMPONENT",
+          this.context.getters.getGameComponentName
+        );
+        this.context.commit("START_TIMER");
+      }
+      // if it's the score announcing phase
+      if (roundPhase == 3) {
+        this.context.dispatch("setScoresFromPlayersIds", scores);
+        this.context.commit("SET_GAME_COMPONENT", "ScoreAnnouncer");
+      }
+    }
     router.replace({
       name: "room",
       params: { id: roomId },
@@ -257,31 +347,63 @@ export default class Room extends VuexModule {
 
   @Action
   wsNewRound({ word }: { word: string }) {
+    // prepare for a new round by resetting all the state modified in the previous round
+    this.context.commit("RESET_ROUND_STATE");
+    // reset the state of the player and the whole party as having found the correct answer
+    this.context.commit("RESET_PARTY_FOUND_ANSWER");
+    this.context.commit("RESET_PLAYER_FOUND_ANSWER");
+
     const gameComponent = this.context.getters.getRoomComponent;
     // increment the round
     this.context.commit("NEXT_ROUND");
     // at the beginning of the round, set the room component to RoundAnnouncer if it is not already
-    if (gameComponent != "RoundAnnouncer")
-      this.context.commit("SET_ROOM_COMPONENT", "RoundAnnouncer");
-    // increment the round counter
+    if (gameComponent != "RoundAnnouncer") {
+      this.context.commit("SET_GAME_COMPONENT", "RoundAnnouncer");
+    }
+
     // set the hint word
     this.context.commit("SET_WORD", word);
+    // reset the round score after displaying them in the previous round
+    this.context.commit("RESET_ROUND_SCORE");
   }
 
   @Action
   wsTimerStarted() {
     // load the game component at the starting of the timer
     this.context.commit(
-      "SET_ROOM_COMPONENT",
+      "SET_GAME_COMPONENT",
       this.context.getters.getGameComponentName
     );
     // start counting down
     this.context.commit("START_TIMER");
   }
 
+  /** replaces the player ids within the raw score object with the player names */
   @Action
-  wsDisplayScores() {
+  setScoresFromPlayersIds(scoresWithIds: RoundScore) {
+    const party = this.context.rootGetters.getParty;
+    const scoreUnernames: RoundScore = {};
+    for (const [playerId, score] of Object.entries(scoresWithIds)) {
+      const playerName: string = party[playerId].username;
+      scoreUnernames[playerName] = score as number;
+    }
+    this.context.commit("SET_ROUND_SCORE", scoreUnernames);
+  }
+
+  @Action
+  wsDisplayScores({ scores }: { scores: RoundScore }) {
     this.context.commit("STOP_TIMER");
-    this.context.commit("SET_ROOM_COMPONENT", "ScoreAnnouncer");
+
+    this.context.dispatch("setScoresFromPlayersIds", scores);
+    // increment the round score for each player according to the player id
+    this.context.commit("INCREMENT_PLAYERS_SCORE", scores);
+
+    this.context.commit("SET_GAME_COMPONENT", "ScoreAnnouncer");
+  }
+
+  @Action
+  wsGameEnded() {
+    //
+    console.warn("GAME ENDED!");
   }
 }

@@ -18,6 +18,7 @@ import { computed, defineAsyncComponent, defineComponent } from "vue";
 import Party from "@/components/Party/Party.vue";
 import Chat from "@/components/Chat/Chat.vue";
 import RoundAnnouncer from "@/components/Games/RoundAnnouncer.vue";
+import ScoreAnnouncer from "@/components/Games/ScoreAnnouncer.vue";
 import GameLoader from "@/components/Games/GameLoader.vue";
 
 export default defineComponent({
@@ -30,6 +31,7 @@ export default defineComponent({
     Party,
     Chat,
     RoundAnnouncer,
+    ScoreAnnouncer,
     Shuffler: defineAsyncComponent({
       loader: () => import("@/components/Games/Shuffler.vue"),
       loadingComponent: GameLoader,

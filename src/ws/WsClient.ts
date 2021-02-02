@@ -16,9 +16,12 @@ interface MessageFormat {
   event: string;
   message?: string;
   playerId?: string;
-  word?: string;
   type?: string;
   scores?: { [playerName: string]: number };
+  word?: string;
+  roundPhase?: number;
+  remainingTime?: number;
+  round?: number;
 }
 
 interface SnackOptions {
@@ -117,6 +120,10 @@ export class WsClient {
         // * scores EVENT
         case "score": // received when the round ends
           this._store.dispatch("wsDisplayScores", data);
+          break;
+        // * scores EVENT
+        case "gameEnded": // received when the round ends
+          this._store.dispatch("wsGameEnded");
           break;
         // * nextEvent
       }
