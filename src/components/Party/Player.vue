@@ -2,8 +2,12 @@
   <!-- Player -->
   <div
     id="player"
-    class="flex items-center w-95/1 my-2 h-10 xl:h-11 2xl:h-14 mx-auto rounded-md bg-gray-100 text-gray-900 overflow-hidden shadow"
-    :class="{ 'border-b-2 border-gray-800': player.isTurn && !isLobby }"
+    class="flex items-center w-95/1 my-2 h-10 xl:h-11 2xl:h-14 mx-auto rounded-md text-gray-900 overflow-hidden shadow"
+    :class="{
+      'border-b-2 border-gray-800': player.isTurn && !isLobby,
+      'bg-teal-100': player.foundAnswer,
+      'bg-gray-100': !player.foundAnswer,
+    }"
   >
     <!-- Turn circle section -->
     <turn-circle :is-turn="player.isTurn" />
@@ -14,7 +18,7 @@
     <!-- SCORE -->
     <div
       id="score"
-      class="flex items-center justify-center h-full text-md font-bold w-8 bg-gray-800 text-gray-50"
+      class="flex items-center justify-center h-full text-md font-bold w-10 bg-gray-800 text-gray-50"
     >
       {{ score }}
     </div>
@@ -33,14 +37,6 @@ export default defineComponent({
       type: Object,
       required: true,
     },
-    // isTurn: {
-    //   type: Boolean,
-    //   required: true,
-    // },
-    // name: {
-    //   type: String,
-    //   required: true,
-    // },
   },
   components: { TurnCircle },
   computed: {

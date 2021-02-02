@@ -3,7 +3,8 @@ export interface ChatMessage extends MessageData {
   id: number;
 }
 interface MessageData {
-  from?: string;
+  playerId: string; // used to uniquely identify the player that found the correct answer and display the check mark and stop the timer for him/her
+  from?: string; // player id
   message?: string; // if the type number is 1, the message property is undefined and is always "playerid has found the answer",
   type: number; // undefined = regular. 1 = just found correct answer, 2 = already answered, 3 = rate limiter slow down
 }
@@ -53,6 +54,20 @@ export default class Party extends VuexModule {
    */
   @Action
   wsChatMessageReceived(messageData: MessageData) {
+    // if the player has found the correct answer
+    if (messageData.type == 1) {
+      if (messageData.playerId === this.context.rootGetters.getPlayerId) {
+        // stop the timer count down when the player finds the correct answer
+        this.context.commit("STOP_TIMER");
+        // set the player as having found the answer to display the check mark
+        this.context.commit("SET_PLAYER_FOUND_ANSWER");
+      }
+      // set the party member as having found the answer
+      this.context.commit(
+        "SET_PARTY_MEMBER_FOUND_ANSWER",
+        messageData.playerId
+      );
+    }
     this.context.commit("ADD_MESSAGE", messageData);
   }
   @Action
