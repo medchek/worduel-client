@@ -123,9 +123,17 @@ export default defineComponent({
     };
     const roundSelected = (id: number) => {
       // console.log("selected roundCount => ", id);
+      const totalRounds = roundCount.options.find(option => option.id == id);
+      if (totalRounds) {
+        store.commit("SET_ROUND_COUNT", totalRounds.value);
+      }
       ws.dispatch.updateSettings(2, id);
     };
     const timeSelected = (id: number) => {
+      const roundTime = timePerRound.options.find(option => option.id == id);
+      if (roundTime) {
+        store.commit("SET_TIME_PER_ROUND", roundTime.value);
+      }
       // console.log("selected timePerRound => ", id);
       ws.dispatch.updateSettings(3, id);
     };
