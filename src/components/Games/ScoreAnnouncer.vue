@@ -5,17 +5,19 @@
   >
     <h1 class="text-3xl mb-2">Scores</h1>
     <div
-      v-for="(score, playerName, index) in roundScore"
+      v-for="(playerScore, index) in roundScore"
       :key="index"
       id="player-score"
       class="flex items-center w-1/2 bg-gray-200 h-12 rounded-lg overflow-hidden my-2"
     >
-      <span id="player-score-name" class="text-xl pl-2">{{ playerName }}</span>
+      <span id="player-score-name" class="text-xl pl-2">{{
+        playerScore.username
+      }}</span>
       <div
         id="score-points"
         class="ml-auto h-full w-10 flex justify-center items-center bg-gray-800 text-white"
       >
-        {{ score }}
+        {{ playerScore.score }}
       </div>
     </div>
   </div>

@@ -31,6 +31,10 @@ interface RoomJoinedEvent {
 export interface RoundScore {
   [playerName: string]: number;
 }
+export interface PlayerScore {
+  username: string;
+  score: number;
+}
 
 @Module
 export default class Room extends VuexModule {
@@ -378,16 +382,22 @@ export default class Room extends VuexModule {
     this.context.commit("START_TIMER");
   }
 
-  /** replaces the player ids within the raw score object with the player names */
+  /** returns a sorted array of the player scores, replacing the ids with the players username */
   @Action
-  setScoresFromPlayersIds(scoresWithIds: RoundScore) {
+  setScoresFromPlayersIds(rawScores: RoundScore) {
     const party = this.context.rootGetters.getParty;
-    const scoreUnernames: RoundScore = {};
-    for (const [playerId, score] of Object.entries(scoresWithIds)) {
+    const scores: PlayerScore[] = [];
+
+    for (const [playerId, score] of Object.entries(rawScores)) {
       const playerName: string = party[playerId].username;
-      scoreUnernames[playerName] = score as number;
+      scores.push({
+        username: playerName,
+        score,
+      });
     }
-    this.context.commit("SET_ROUND_SCORE", scoreUnernames);
+    // sort the scores based on the score points from highest to lowest
+    const sortedScores = scores.sort((a, b) => b.score - a.score);
+    this.context.commit("SET_ROUND_SCORE", sortedScores);
   }
 
   @Action
@@ -403,7 +413,7 @@ export default class Room extends VuexModule {
 
   @Action
   wsGameEnded() {
-    //
+    // display the final scores
     console.warn("GAME ENDED!");
   }
 }
