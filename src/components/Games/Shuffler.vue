@@ -1,5 +1,8 @@
 <template>
-  <div id="shuffler" class="flex flex-col flex-grow w-full items-center">
+  <div
+    id="shuffler"
+    class="flex flex-col flex-grow w-full items-center relative"
+  >
     <div
       class="flex flex-grow-0 items-center text-2xl xl:text-3xl 2xl:text-4xl h-14 text-gray-400"
       ref="wordSection"
@@ -20,6 +23,14 @@
         {{ word }}
       </div>
     </div>
+
+    <div
+      id="round-status"
+      class="flex items-center justify-between absolute w-2/3 text-gray-300 h-10 bottom-0 text-lg mb-10 font-bold"
+    >
+      <span>Round {{ currentRound }}/{{ roundCount }}</span>
+      <span>Timer: {{ remainingTime }}s</span>
+    </div>
   </div>
 </template>
 
@@ -38,6 +49,9 @@ export default defineComponent({
       word: computed(() => store.getters.getWord),
       playerFoundAnswer: computed(() => store.getters.getPlayerFoundAnswer),
       mdiCheck,
+      currentRound: computed(() => store.getters.getCurrentRound),
+      roundCount: computed(() => store.getters.getRoundCount),
+      remainingTime: computed(() => store.getters.getCurrentTime),
     };
   },
   components: {

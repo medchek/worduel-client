@@ -57,6 +57,7 @@ export default class Room extends VuexModule {
   word = "";
   // the component to load in the game room. (RoundAnnouncer, GameComponentName, or ScoreAnnouncer)
   component = "RoundAnnouncer";
+  // component = "Shuffler"; // ! FIXME REMOVE THIS AFTER TESTING
   // component = "ScoreAnnouncer"; // ! FIXME REMOVE THIS AFTER TESTING
 
   gameEnded = false;
@@ -83,6 +84,10 @@ export default class Room extends VuexModule {
 
   get getTimePerRound(): number {
     return this.settings.timePerRound;
+  }
+
+  get getRoundCount(): number {
+    return this.settings.roundCount;
   }
 
   get getCurrentTime(): number {
