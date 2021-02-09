@@ -64,8 +64,7 @@ export class WsClient {
       this.onMessage();
     } catch (err) {
       console.error(err);
-      // reject("Could not connect to the server");
-      throw new Error("Error while connection to the server.");
+      throw new Error("Error while establishing connection to the server.");
     }
   }
   /**============================================================================
@@ -163,6 +162,7 @@ export class WsClient {
           name: "home",
         });
       }
+      this._store.dispatch("resetStore");
       console.error("[WsClient] onClose() =>", err);
     };
   }

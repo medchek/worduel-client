@@ -11,5 +11,14 @@ export default createStore({
     Party,
     Chat,
   },
+  actions: {
+    /** Reset the whole store to its default state*/
+    resetStore({ commit }): void {
+      commit("RESET_ALL_PARTY");
+      commit("RESET_ALL_UI");
+      commit("RESET_ALL_ROOM");
+      commit("RESET_ALL_CHAT");
+    },
+  },
   plugins: process.env.NODE_ENV !== "production" ? [createLogger()] : [],
 });

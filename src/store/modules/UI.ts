@@ -43,6 +43,13 @@ export default class UserInterface extends VuexModule {
     this.selectedGameId = selectedGameId;
   }
 
+  /** RESET THE UI MODULE BACK TO ITS DEFAULT STATE */
+  @Mutation
+  RESET_ALL_UI(): void {
+    this.isBeginLoading = false;
+    this.selectedGameId = null;
+  }
+
   @Mutation
   SET_SNACK(snack: SnackBar) {
     if (this.snack.timeout) clearTimeout(this.snack.timeout);

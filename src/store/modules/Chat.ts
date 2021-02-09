@@ -48,6 +48,12 @@ export default class Party extends VuexModule {
     this.chat.unshift({ id: Date.now(), ...message });
   }
 
+  /** REST THE CHAT MODULES TO ITS DEFAULT STATE */
+  @Mutation
+  RESET_ALL_CHAT(): void {
+    this.chat = [];
+  }
+
   /**
    * event received when the server sends a chat message
    * @param message the message data

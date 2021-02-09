@@ -244,7 +244,25 @@ export default class Room extends VuexModule {
   SET_GAME_ENDED(ended = true) {
     this.gameEnded = ended;
   }
-
+  /** RESETS THE ENTIRETY OF THE ROOM STACK BACK TO ITS DEFAULT VALUES */
+  @Mutation
+  RESET_ALL_ROOM(): void {
+    this.isLobby = true;
+    this.gameId = undefined;
+    this.roomId = undefined;
+    this.settings = {
+      difficulty: 2,
+      timePerRound: 60,
+      roundCount: 6,
+    };
+    this.timer = null;
+    this.currentTime = this.settings.timePerRound;
+    this.currentRound = 0;
+    this.roundScore = null;
+    this.word = "";
+    this.component = "RoundAnnouncer";
+    this.gameEnded = false;
+  }
   // ACTIONS
 
   @Action

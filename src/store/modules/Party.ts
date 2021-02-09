@@ -107,4 +107,12 @@ export default class Party extends VuexModule {
       this.party[playerId].score += score;
     }
   }
+
+  /** RESET THE PART MODULE BACK TO ITS DEFAULT STATE */
+  @Mutation
+  RESET_ALL_PARTY(): void {
+    this.party = {};
+    this.playerId = undefined;
+    this.playerFoundAnswer = false;
+  }
 }
