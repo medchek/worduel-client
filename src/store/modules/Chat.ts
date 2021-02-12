@@ -60,15 +60,9 @@ export default class Party extends VuexModule {
    */
   @Action
   wsChatMessageReceived(messageData: MessageData) {
-    // if the player has found the correct answer
-    if (messageData.type == 1) {
-      if (messageData.playerId === this.context.rootGetters.getPlayerId) {
-        // stop the timer count down when the player finds the correct answer
-        this.context.commit("STOP_TIMER");
-        // set the player as having found the answer to display the check mark
-        this.context.commit("SET_PLAYER_FOUND_ANSWER");
-      }
-      // set the party member as having found the answer
+    // if a player has found the correct answer
+    // set the party member as having found the answer
+    if (messageData.type === 1) {
       this.context.commit(
         "SET_PARTY_MEMBER_FOUND_ANSWER",
         messageData.playerId
@@ -76,6 +70,27 @@ export default class Party extends VuexModule {
     }
     this.context.commit("ADD_MESSAGE", messageData);
   }
+
+  @Action
+  wsCorrectAnswer({ message }: { message: string }) {
+    // stop the timer count down when the player finds the correct answer
+    this.context.commit("STOP_TIMER");
+    // set the player as having found the answer to display the check mark
+    this.context.commit("SET_PLAYER_FOUND_ANSWER");
+    // reveal the correct answer instead of the shuffled word
+    this.context.commit("SET_WORD", message);
+    // apply the changes to the party aswell using the current client's id
+    this.context.commit(
+      "SET_PARTY_MEMBER_FOUND_ANSWER",
+      this.context.getters.getPlayerId
+    );
+    // add a chat message as well
+    this.context.commit("ADD_MESSAGE", {
+      from: "You",
+      type: 1, // undefined = regular. 1 = just found correct answer, 2 = already answered, 3 = rate limiter slow down
+    });
+  }
+
   @Action
   wsChatSlowDown() {
     this.context.commit("ADD_MESSAGE", {

@@ -112,6 +112,10 @@ export class WsClient {
         case "message": // recevied when client send messages/answers in the chat
           this._store.dispatch("wsChatMessageReceived", data);
           break;
+        // * chat message EVENT
+        case "correct": // recevied when client answers correctly
+          this._store.dispatch("wsCorrectAnswer", data);
+          break;
         // * chat rate limiting EVENT
         case "slowDown": // recieved when client sends too many messages in a short amount of time
           this._store.dispatch("wsChatSlowDown");

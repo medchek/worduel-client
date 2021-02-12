@@ -18,6 +18,7 @@ export default class Party extends VuexModule {
   party: Members = {};
   /** the current player id */
   playerId: string | undefined;
+  /** State used to tell whether the player has found the correct answer */
   playerFoundAnswer = false;
 
   get isPartyDataReceived(): boolean {
