@@ -6,7 +6,7 @@
       snack.type === 'success'
         ? ' bg-green-200 text-green-600 border-green-300'
         : snack.type == 'info'
-        ? 'bg-gray-400 text-gray-900 border-gray-500'
+        ? 'bg-gray-50 text-gray-900 border-transparent'
         : 'bg-red-200 text-red-600 border-red-300',
     ]"
   >
