@@ -18,7 +18,8 @@
         v-if="playerFoundAnswer"
       />
       <div
-        class="word text-5xl 2xl:text-7xl font-bold text-gray-800 rounded-md z-10 uppercase"
+        class="word text-5xl 2xl:text-7xl font-bold rounded-md z-10 uppercase"
+        :class="hasFoundAnswer ? 'text-teal-500' : 'text-gray-800'"
       >
         {{ word }}
       </div>
@@ -52,6 +53,7 @@ export default defineComponent({
       currentRound: computed(() => store.getters.getCurrentRound),
       roundCount: computed(() => store.getters.getRoundCount),
       remainingTime: computed(() => store.getters.getCurrentTime),
+      hasFoundAnswer: computed(() => store.getters.getPlayerFoundAnswer),
     };
   },
   components: {
