@@ -48,10 +48,11 @@
           <template v-else>
             <span class="font-bold text-gray-700">{{ message.from }} </span>
             <!-- MESSAGE CONTENT -->
+            <!-- If the message type === 1 = player has found correct answer -->
             <span v-if="message.type == 1" class="font-bold">
-              has found the answer!</span
+              {{ auxilary }} found the answer!</span
             >
-            <!-- if type = 2 (has already found the answer, change the color) -->
+            <!-- if type = 2 (has already found the answer, change the color), otherwise leave it as default -->
             <span v-else :class="message.type == 2 ? 'text-teal-700' : ''"
               >: {{ message.message }}
             </span>
@@ -136,7 +137,22 @@ export default defineComponent({
       inputMessage.value = "";
     };
 
-    return { chat, inputMessage, messageCount, answer, chatRef };
+    const currentPlayerFoundAnswer = computed(
+      () => store.getters.getPlayerFoundAnswer
+    );
+    const auxilary = computed(() =>
+      currentPlayerFoundAnswer.value ? "has" : "have"
+    );
+
+    return {
+      chat,
+      inputMessage,
+      messageCount,
+      answer,
+      chatRef,
+      currentPlayerFoundAnswer,
+      auxilary,
+    };
   },
 });
 </script>
