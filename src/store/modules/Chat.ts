@@ -68,7 +68,7 @@ export default class Party extends VuexModule {
         messageData.playerId
       );
     }
-    this.context.commit("ADD_MESSAGE", messageData);
+    this.context.commit("ADD_MESSAGE", { ...messageData, you: false });
   }
 
   @Action
@@ -87,6 +87,8 @@ export default class Party extends VuexModule {
     // add a chat message as well
     this.context.commit("ADD_MESSAGE", {
       from: "You",
+      // used to display "you have found the answer" instead of a "playername has found the answer" for the current client
+      you: true,
       type: 1, // undefined = regular. 1 = just found correct answer, 2 = already answered, 3 = rate limiter slow down
     });
   }

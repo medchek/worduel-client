@@ -50,7 +50,8 @@
             <!-- MESSAGE CONTENT -->
             <!-- If the message type === 1 = player has found correct answer -->
             <span v-if="message.type == 1" class="font-bold">
-              {{ auxilary }} found the answer!</span
+              <span v-if="message.you"> have </span>
+              <span v-else> has </span>found the answer!</span
             >
             <!-- if type = 2 (has already found the answer, change the color), otherwise leave it as default -->
             <span v-else :class="message.type == 2 ? 'text-teal-700' : ''"
@@ -137,21 +138,12 @@ export default defineComponent({
       inputMessage.value = "";
     };
 
-    const currentPlayerFoundAnswer = computed(
-      () => store.getters.getPlayerFoundAnswer
-    );
-    const auxilary = computed(() =>
-      currentPlayerFoundAnswer.value ? "has" : "have"
-    );
-
     return {
       chat,
       inputMessage,
       messageCount,
       answer,
       chatRef,
-      currentPlayerFoundAnswer,
-      auxilary,
     };
   },
 });
