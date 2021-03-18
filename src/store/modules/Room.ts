@@ -22,7 +22,7 @@ interface RoomJoinedEvent {
   settings?: RoomSettings;
   // if game has started
   word?: string;
-  roundPhase?: number; // 1 = before timer start,2 = during round when timer is started, 3 = on roud end/score announcing phase
+  phase?: number; // 1 = before timer start,2 = during round when timer is started, 3=turn end/scores announcing, 4 = on roud end/score announcing phase
   remainingTime?: number;
   round?: number;
   scores?: { [payerId: string]: number };
@@ -301,7 +301,7 @@ export default class Room extends VuexModule {
       party,
       settings,
       remainingTime,
-      roundPhase,
+      phase,
       word,
       round,
       scores,
@@ -319,13 +319,13 @@ export default class Room extends VuexModule {
     }
     // set the party with the data given by the server
     this.context.commit("SET_PARTY", { party, playerId });
-    // if the roudPhase is includes in the data, the game has already started
-    if (roundPhase) {
+    // if the game phase is included in the data, the game has already started
+    if (phase) {
       // display the Game view
       this.context.commit("SET_IS_LOBBY", false);
-      // set the word to guess
+      // set the hint word
       this.context.commit("SET_WORD", word);
-      // only increment the round if it wasnt set yet
+      // only set the round if it has not been set yet
       if (this.context.getters.getCurrentRound == 0) {
         this.context.commit("SET_ROUND", round);
       }
@@ -333,7 +333,7 @@ export default class Room extends VuexModule {
       // phase 1 = RoundAnnouncer which is set by default, hence not changing it
 
       // if the round is ongoing
-      if (roundPhase == 2) {
+      if (phase == 2) {
         this.context.commit("SET_REMAINING_TIME", remainingTime);
         this.context.commit(
           "SET_GAME_COMPONENT",
@@ -342,7 +342,7 @@ export default class Room extends VuexModule {
         this.context.commit("START_TIMER");
       }
       // if it's the score announcing phase
-      if (roundPhase == 3) {
+      if (phase == 4 || phase == 3) {
         this.context.dispatch("setScoresFromPlayersIds", scores);
         this.context.commit("SET_GAME_COMPONENT", "ScoreAnnouncer");
       }

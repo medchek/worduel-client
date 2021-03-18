@@ -19,7 +19,7 @@ interface MessageFormat {
   type?: string;
   scores?: { [playerName: string]: number };
   word?: string;
-  roundPhase?: number;
+  phase?: number;
   remainingTime?: number;
   round?: number;
 }
@@ -145,7 +145,7 @@ export class WsClient {
     this._ws.onerror = err => {
       // show snackbar
       this.triggerSnack({
-        message: "An unexpected error occured",
+        message: "An unexpected error occurred",
         type: "error",
       });
       console.error("[WsClient] onError() =>", err);
