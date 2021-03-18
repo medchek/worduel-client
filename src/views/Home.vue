@@ -48,7 +48,7 @@ import { useStore } from "vuex";
 export default defineComponent({
   setup() {
     // const username = ref("");
-    const username = ref(process.env.NODE_ENV !== "production" ? "roleqx" : "");
+    const username = ref(localStorage.getItem("username") || "");
     const selectedGame = ref(1);
     const errorMessage = ref("");
     // watch for input changes and update (display or hide) the error message accordingly
@@ -60,7 +60,7 @@ export default defineComponent({
     const isValidInput = (): boolean => {
       if (!/^[a-zA-Z0-9_. -]{3,15}$/.test(username.value)) {
         errorMessage.value =
-          "You nickname must be 3 to 15 in length and connot contain special characters";
+          "Your nickname must be 3 to 15 in length and connot contain special characters";
         return false;
       }
       return true;
@@ -70,8 +70,20 @@ export default defineComponent({
     const ws = inject("ws") as WsClient;
     const store = useStore();
 
+    /** Store the username entered by the user in the localStorage */
+    const saveUsername = (): void => {
+      const savedUsername = localStorage.getItem("username");
+      if (savedUsername) {
+        // if the usernamed stored in localStorage is similar to the one entered by the user
+        if (savedUsername == username.value) return; // don't do noting, and exit the function
+      }
+      // otherwise, save the new username
+      localStorage.setItem("username", username.value);
+    };
+
     const begin = (): void => {
       if (isValidInput()) {
+        saveUsername();
         // start loading
         store.commit("SET_IS_BEGIN_LOADING", true);
         // get the websocket class instance

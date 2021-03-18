@@ -27,17 +27,18 @@
   </div>
 </template>
 
-<script>
-import { inject, ref, computed } from "vue";
+<script lang="ts">
+import { inject, ref, computed, defineComponent } from "vue";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
 import AppInput from "@/components/AppInput.vue";
 import Loader from "../Loader.vue";
+import { WsClient } from "@/ws/WsClient";
 
-export default {
+export default defineComponent({
   components: { AppInput, Loader },
   setup() {
-    const username = ref("");
+    const username = ref(localStorage.getItem("username") || "");
     const errorMessage = ref("");
     const isValidInput = () => {
       if (!/^[a-zA-Z0-9_. -]{3,15}$/.test(username.value)) {
@@ -49,12 +50,24 @@ export default {
     };
 
     //
-    const ws = inject("ws");
+    const ws = inject("ws") as WsClient;
     const store = useStore();
     const route = useRoute();
 
+    /** Store the username entered by the user in the localStorage */
+    const saveUsername = (): void => {
+      const savedUsername = localStorage.getItem("username");
+      if (savedUsername) {
+        // if the usernamed stored in localStorage is similar to the one entered by the user
+        if (savedUsername == username.value) return; // don't do noting, and exit the function
+      }
+      // otherwise, save the new username
+      localStorage.setItem("username", username.value);
+    };
+
     const join = () => {
       if (isValidInput()) {
+        saveUsername();
         // start loading
         store.commit("SET_IS_BEGIN_LOADING", true);
         // get the websocket class instance
@@ -65,7 +78,7 @@ export default {
           path: "join",
           params: {
             username: username.value,
-            id: route.params.roomId,
+            id: route.params.roomId as string,
           },
         });
       }
@@ -79,5 +92,5 @@ export default {
     };
     // room
   },
-};
+});
 </script>
