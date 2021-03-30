@@ -25,12 +25,15 @@ export default defineComponent({
   computed: {
     ...mapGetters({
       currentRound: "getCurrentRound",
+      hasTurns: "getHasTurns",
     }),
   },
   mounted() {
-    setTimeout(() => {
-      this.getReady = true;
-    }, 1900);
+    if (this.hasTurns) {
+      setTimeout(() => {
+        this.getReady = true;
+      }, 1900);
+    }
   },
 });
 </script>
