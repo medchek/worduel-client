@@ -23,7 +23,7 @@ export default defineComponent({
   props: {
     show: {
       type: Boolean,
-      required: true,
+      default: false,
     },
     // to prevent triggering the select event when the same value is selected over and over
     currentlySelectedIndex: {
