@@ -32,8 +32,8 @@ export default defineComponent({
     const store = useStore();
     const selectedGame: Ref<number | null> = ref(1); // the id of the selected game
     const games = [
-      { id: 1, name: "shuffler", available: true, selected: false },
-      { id: 2, name: "guess", available: false, selected: false },
+      { id: 1, name: "shuffler", available: true, selected: true },
+      { id: 2, name: "guess", available: true, selected: false },
       { id: 3, name: "chance", available: false, selected: false },
     ];
 
