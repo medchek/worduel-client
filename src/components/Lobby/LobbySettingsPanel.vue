@@ -76,7 +76,7 @@
         v-if="player.isLeader"
         :loading="isBtnLoading"
         @click="requestGameStart"
-        class="w-1/3 2xl:w-5/12 h-10 2xl:h-14 bg-gray-800 mx-auto text-white rounded-lg text-2xl font-bold hover:bg-gray-900 transition-colors duration-150 focus:ring-4 ring-teal-300"
+        class="w-1/3 2xl:w-5/12 h-12 2xl:h-14 bg-gray-800 mx-auto text-white rounded-lg text-xl xl:text-2xl font-bold hover:bg-gray-900 transition-colors duration-150 focus:ring-4 ring-teal-300"
       >
         start
       </app-button>
