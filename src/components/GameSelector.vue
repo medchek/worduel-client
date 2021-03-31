@@ -48,7 +48,7 @@ export default defineComponent({
       }
       selectedGame.value = id;
       emit("game-selected", id);
-      store.commit("SET_SELECTED_GAME", id);
+      store.commit("SET_GAME_ID", id);
     };
     return { selectedGame, games, setSelectedGame };
   },
