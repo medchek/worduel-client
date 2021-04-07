@@ -62,6 +62,7 @@
       </div>
       <!-- SECTION CHAT INPUT  -->
       <div
+        v-if="renderChatInput"
         id="chat-input"
         class="h-18 2xl:h-18 px-2 pt-2 mt-1 border-t border-gray-500 border-opacity-40 bg-gray-300"
       >
@@ -131,18 +132,33 @@ export default defineComponent({
      * send an answer to the server
      */
     const answer = () => {
-      if (!inputMessage.value) return;
+      if (!inputMessage.value && inputMessage.value.length > 100) return;
       ws.dispatch.answer(inputMessage.value);
       // scroll the chat to the bottom after sending a message
       scrollChat();
       inputMessage.value = "";
     };
 
+    // if the current game does not feature a turn system, render the chat input without further checks
+    const hasTurn = computed<boolean>(() => store.getters.getHasTurns);
+    // if not, and if the current client is currently playing, dont render the answer input
+    const isTurn = computed<boolean>(() => store.getters.getIsTurn);
+    const renderChatInput = computed<boolean>(() => {
+      if (!hasTurn.value) {
+        return true;
+      } else {
+        if (isTurn.value) {
+          return false;
+        } else return true;
+      }
+    });
+
     return {
       chat,
       inputMessage,
       messageCount,
       answer,
+      renderChatInput,
       chatRef,
     };
   },
