@@ -5,7 +5,7 @@
   >
     <p class="text-5xl 2xl:text-6xl">Round {{ currentRound }}</p>
     <p
-      v-if="getReady"
+      v-if="getReady && !hasTurns"
       class="text-3xl text-teal-500 font-normal transition-all duration-300"
     >
       Get ready!
