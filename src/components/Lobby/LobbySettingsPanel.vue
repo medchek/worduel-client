@@ -13,7 +13,7 @@
     <div id="settings-base" class="flex flex-col w-full px-4 py-2 flex-grow">
       <!-- TEXT -->
       <p class="text-lg 2xl:text-xl text-gray-500 font-semibold">
-        Give this link for your friends to join you
+        Give this link to your friends so they can join you
       </p>
       <!--  INPUT SECTION -->
       <div id="link-input" class="flex w-full h-10 2xl:h-14 my-2">
@@ -61,7 +61,7 @@
           :sid="roundCount.sid"
         />
         <lobby-setting
-          label="time per round"
+          :label="`time per ${hasTurns ? 'turn' : 'round'}`"
           :options="timePerRound.options"
           @idSelected="timeSelected($event)"
           :defaultSelectedIndex="1"
@@ -197,6 +197,7 @@ export default defineComponent({
       startBtnTitle,
       requestGameStart,
       isBtnLoading,
+      hasTurns: computed(() => store.getters.getHasTurns),
     };
   },
 });
