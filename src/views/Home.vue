@@ -89,8 +89,8 @@ export default defineComponent({
         // get the websocket class instance
         // request a connection
         ws.initConnection({
-          host: "localhost",
-          port: 9000,
+          host: process.env.VUE_APP_SERVER_HOST,
+          port: process.env.VUE_APP_SERVER_PORT,
           path: "create",
           params: {
             username: username.value,
