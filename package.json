@@ -9,9 +9,9 @@
   },
   "dependencies": {
     "axios": "^0.21.1",
-    "core-js": "^3.9.1",
-    "vue": "^3.0.9",
-    "vue-router": "^4.0.5",
+    "core-js": "^3.10.1",
+    "vue": "^3.0.11",
+    "vue-router": "^4.0.6",
     "vuex": "^4.0.0"
   },
   "devDependencies": {
@@ -24,16 +24,16 @@
     "@vue/cli-plugin-typescript": "^4.5.12",
     "@vue/cli-plugin-vuex": "^4.5.12",
     "@vue/cli-service": "^4.5.12",
-    "@vue/compiler-sfc": "^3.0.9",
+    "@vue/compiler-sfc": "^3.0.11",
     "@vue/eslint-config-prettier": "^6.0.0",
     "@vue/eslint-config-typescript": "^5.0.2",
     "autoprefixer": "^9.8.6",
     "eslint": "^6.7.2",
-    "eslint-plugin-prettier": "^3.3.1",
-    "eslint-plugin-vue": "^7.8.0",
+    "eslint-plugin-prettier": "^3.4.0",
+    "eslint-plugin-vue": "^7.9.0",
     "postcss": "^7.0.35",
     "prettier": "^1.19.1",
-    "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.0.4",
+    "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.1.0",
     "typescript": "^3.9.9",
     "vuex-module-decorators": "^1.0.1"
   },
