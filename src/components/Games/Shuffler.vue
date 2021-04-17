@@ -38,7 +38,7 @@
 <script lang="ts">
 import { computed, defineComponent } from "vue";
 import { useStore } from "vuex";
-import Timer from "./Timer.vue";
+import Timer from "./TimerRadial.vue";
 import AppIcon from "@/components/AppIcon.vue";
 
 import { mdiCheck } from "@mdi/js";
