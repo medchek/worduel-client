@@ -29,7 +29,7 @@ export default defineComponent({
     }),
   },
   mounted() {
-    if (this.hasTurns) {
+    if (!this.hasTurns) {
       setTimeout(() => {
         this.getReady = true;
       }, 1900);
