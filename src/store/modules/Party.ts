@@ -1,4 +1,4 @@
-import { Module, Mutation, VuexModule } from "vuex-module-decorators";
+import { Module, Mutation, VuexModule, Action } from "vuex-module-decorators";
 import { RoundScore } from "./Room";
 export interface Member {
   id: string;
@@ -18,8 +18,12 @@ export default class Party extends VuexModule {
   party: Members = {};
   /** the current player id */
   playerId: string | undefined;
-  /** State used to tell whether the player has found the correct answer */
+  /** State used to tell whether this client has found the correct answer */
   playerFoundAnswer = false;
+  /** Used to know whether the current player (this client) is selction a word */
+  isSelectingWord = false;
+  // the neame of the player that is currently playing during the turn
+  currentTurnPlayerId = "";
 
   get isPartyDataReceived(): boolean {
     return Object.keys(this.party).length > 0;
@@ -44,6 +48,23 @@ export default class Party extends VuexModule {
 
   get getPlayerFoundAnswer(): boolean {
     return this.playerFoundAnswer;
+  }
+
+  get getIsSelectingWord(): boolean {
+    return this.isSelectingWord;
+  }
+  get getCurrentTurnPlayer(): string {
+    return this.currentTurnPlayerId;
+  }
+
+  get getCurrentTurnPlayerName(): string {
+    return this.party[this.currentTurnPlayerId].username;
+  }
+  /** Whether or not the current client is playing this turn */
+  get getIsTurn(): boolean {
+    if (this.playerId) {
+      return this.party[this.playerId].isTurn;
+    } else return false;
   }
 
   @Mutation
@@ -90,7 +111,7 @@ export default class Party extends VuexModule {
   }
 
   @Mutation
-  RESET_PLAYER_FOUND_ANSWER() {
+  RESET_CLIENT_FOUND_ANSWER() {
     this.playerFoundAnswer = false;
   }
 
@@ -108,6 +129,31 @@ export default class Party extends VuexModule {
       this.party[playerId].score += score;
     }
   }
+  @Mutation
+  SET_IS_SELECTING_WORD(payload = true) {
+    this.isSelectingWord = payload;
+  }
+
+  /**
+   * Reset the turn state for the last playing party member in the party
+   */
+  @Mutation
+  RESET_LAST_PLAYER_TURN_STATE() {
+    if (this.currentTurnPlayerId === "") return;
+    else {
+      this.party[this.currentTurnPlayerId].isTurn = false;
+    }
+  }
+
+  @Mutation
+  SET_PARTY_CURRENT_PLAYER_TURN(playerId: string) {
+    this.party[playerId].isTurn = true;
+  }
+
+  @Mutation
+  SET_CURRENT_TURN_PLAYER_ID(playerName: string): void {
+    this.currentTurnPlayerId = playerName;
+  }
 
   /** RESET THE PART MODULE BACK TO ITS DEFAULT STATE */
   @Mutation
@@ -115,5 +161,19 @@ export default class Party extends VuexModule {
     this.party = {};
     this.playerId = undefined;
     this.playerFoundAnswer = false;
+    this.isSelectingWord = false;
+    this.currentTurnPlayerId = "";
+  }
+
+  @Action
+  removePartyMember(playerId: string) {
+    const playerUsername = this.party[playerId].username;
+    this.context.commit("REMOVE_PARTY_MEMBER", playerId);
+    if (!this.context.rootGetters.getIsLobby) {
+      this.context.commit("ADD_MESSAGE", {
+        type: 4,
+        from: playerUsername,
+      });
+    }
   }
 }

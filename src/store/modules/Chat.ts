@@ -6,7 +6,7 @@ interface MessageData {
   playerId: string; // used to uniquely identify the player that found the correct answer and display the check mark and stop the timer for him/her
   from?: string; // player id
   message?: string; // if the type number is 1, the message property is undefined and is always "playerid has found the answer",
-  type: number; // undefined = regular. 1 = just found correct answer, 2 = already answered, 3 = rate limiter slow down
+  type: number; // undefined = regular. 1 = just found correct answer, 2 = already answered, 3 = rate limiter slow down, 4 = player has disconnected
 }
 
 @Module

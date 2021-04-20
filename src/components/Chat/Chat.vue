@@ -37,6 +37,7 @@
             type === 1 => has just found correct answer !
             type === 2 => has already found answer 
             type === 3 => rate limiting message
+            type === 4 => player disconnected
           -->
 
           <!-- only display if message type is not 1. 1 = player has found the answer -->
@@ -44,6 +45,10 @@
           <!-- MESSAGE FROM -->
           <span v-if="message.type == 3" class="text-red-600 font-bold"
             >wait before sending more messages</span
+          >
+          <span v-else-if="message.type == 4" class="text-blue-500"
+            ><span class="font-bold">{{ message.from }}</span> has
+            disconnected</span
           >
           <template v-else>
             <span class="font-bold text-gray-700">{{ message.from }} </span>
