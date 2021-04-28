@@ -7,7 +7,7 @@
   </section>
 </template>
 
-<script>
+<script lang="ts">
 import { ref } from "vue";
 import axios from "axios";
 
@@ -17,6 +17,8 @@ import JoinPanel from "@/components/Join/JoinPanel.vue";
 
 import { defineComponent } from "vue";
 import { useRoute } from "vue-router";
+
+import { server } from "../config/settings";
 
 export default defineComponent({
   components: {
@@ -31,12 +33,8 @@ export default defineComponent({
     // check if param.roomId exists
     axios
       .get(
-        `${process.env.VUE_APP_SERVER_PROTOCOL}://${
-          process.env.VUE_APP_SERVER_HOST
-        }${
-          process.env.VUE_APP_SERVER_PORT
-            ? `:${process.env.VUE_APP_SERVER_PORT}`
-            : ""
+        `${server.protocol}://${server.host}${
+          server.port ? `:${server.port}` : ""
         }/join/${route.params.roomId}`
       )
       .then(() => {

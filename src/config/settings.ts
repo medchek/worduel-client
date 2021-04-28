@@ -45,3 +45,12 @@ export const timePerRound = {
     { id: 5, value: 150 },
   ],
 };
+
+const isProd = process.env.NODE_ENV && process.env.NODE_ENV === "production";
+
+export const server = {
+  protocol: isProd ? "https" : "http",
+  wsProtocol: isProd ? "wss" : "ws",
+  host: isProd ? "worduel.herokuapp.com" : "localhost",
+  port: isProd ? undefined : 9001,
+};

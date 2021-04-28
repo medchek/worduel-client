@@ -38,6 +38,8 @@ import { WsClient } from "@/ws/WsClient";
 export default defineComponent({
   components: { AppInput, Loader },
   setup() {
+    // const username = ref("JOINER");
+    // FIXME REMOVE PRESET USERNAME AFTER TESTING
     const username = ref(localStorage.getItem("username") || "");
     const errorMessage = ref("");
     const isValidInput = () => {
@@ -73,8 +75,6 @@ export default defineComponent({
         // get the websocket class instance
         // request a connection
         ws.initConnection({
-          host: process.env.VUE_APP_SERVER_HOST,
-          port: process.env.VUE_APP_SERVER_PORT,
           path: "join",
           params: {
             username: username.value,

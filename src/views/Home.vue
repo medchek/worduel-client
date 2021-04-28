@@ -1,14 +1,19 @@
 <template>
-  <div class="w-full text-center">
+  <div class="w-full text-center relative overflow-hidden">
+    <!-- <div
+      class="landing-curved absolute h-48 2xl:h-96 bg-teal-400 w-full right-0 left-0 mx-auto z-0"
+    ></div> -->
     <div
-      class="w-11/12 mx-auto lg:w-2/3 xl:w-1/2 text-center mt-5 2xl:mt-8 font-semibold text-teal-500"
+      class="w-11/12 md:w-10/12 lg:w-2/3 xl:w-1/2 mx-auto text-center mt-5 2xl:mt-8 font-semibold text-teal-500 z-10 relative"
     >
-      <h1 class="text-xl sm:text-3xl lg:text-4xl 2xl:text-5xl">
+      <h1 class="text-2xl sm:text-3xl md:text-4xl 2xl:text-5xl">
         Word themed multiplayer games to enjoy with your friends
       </h1>
     </div>
     <!-- GAMES SELECTION PARTH -->
-    <div class="border-t-2 border-teal-700 mt-5 2xl:mt-10 pt-5 w-3/4 mx-auto">
+    <div
+      class="border-t-2 border-teal-600 mt-5 2xl:mt-10 pt-5 w-3/4 mx-auto relative z-10"
+    >
       <app-input
         v-model:value="username"
         @update:username="username = $event"
@@ -47,7 +52,8 @@ import { useStore } from "vuex";
 
 export default defineComponent({
   setup() {
-    // const username = ref("");
+    // const username = ref("Creator");
+    // FIXME REMOVE PRESET USERNAME AFTER TESTING
     const username = ref(localStorage.getItem("username") || "");
     const selectedGame = ref(1);
     const errorMessage = ref("");
@@ -89,8 +95,6 @@ export default defineComponent({
         // get the websocket class instance
         // request a connection
         ws.initConnection({
-          host: process.env.VUE_APP_SERVER_HOST,
-          port: process.env.VUE_APP_SERVER_PORT,
           path: "create",
           params: {
             username: username.value,
@@ -116,3 +120,10 @@ export default defineComponent({
   },
 });
 </script>
+
+<style scoped>
+/* .landing-curved {
+  border-radius: 0 0 50% 50% / 0 0 100% 100%;
+  transform: scale(1.4);
+} */
+</style>
