@@ -1,6 +1,6 @@
 {
   "name": "worduel-client",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "axios": "^0.21.1",
-    "core-js": "^3.10.1",
+    "core-js": "^3.11.0",
     "vue": "^3.0.11",
     "vue-router": "^4.0.6",
     "vuex": "^4.0.0"
@@ -33,7 +33,7 @@
     "eslint-plugin-vue": "^7.9.0",
     "postcss": "^7.0.35",
     "prettier": "^1.19.1",
-    "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.1.0",
+    "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.1.2",
     "typescript": "^3.9.9",
     "vuex-module-decorators": "^1.0.1"
   },
