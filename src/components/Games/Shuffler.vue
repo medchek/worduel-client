@@ -18,7 +18,7 @@
         v-if="playerFoundAnswer"
       />
       <div
-        class="word text-5xl 2xl:text-7xl font-bold rounded-md z-10 uppercase"
+        class="word text-4xl lg:text-5xl 2xl:text-7xl font-bold rounded-md z-10 uppercase"
         :class="playerFoundAnswer ? 'text-teal-500' : 'text-gray-800'"
       >
         {{ word }}

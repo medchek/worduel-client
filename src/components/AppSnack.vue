@@ -1,12 +1,12 @@
 <template>
   <div
     id="snackbar"
-    class="flex items-center pl-5 w-4/5 sm:w-96 xl:w-1/3 h-14 sm:h-16 absolute bottom-4 left-0 right-0 mx-auto font-bold rounded-xl border overflow-hidden shadow-sm"
+    class="flex items-center pl-2 lg:pl-5 w-4/5 sm:w-96 xl:w-1/3 h-14 sm:h-16 absolute bottom-4 left-0 right-0 mx-auto font-bold rounded-lg lg:rounded-xl border overflow-hidden shadow-lg text-sm lg:text-base"
     :class="[
       snack.type === 'success'
         ? ' bg-green-200 text-green-600 border-green-300'
         : snack.type == 'info'
-        ? 'bg-gray-50 text-gray-900 border-transparent shadow-md'
+        ? 'bg-gray-50 text-gray-900 border-transparent'
         : 'bg-red-200 text-red-600 border-red-300',
     ]"
   >

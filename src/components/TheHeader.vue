@@ -8,7 +8,7 @@
     >
     <div class="flex-grow"></div>
     <div class="h-full self-end flex items-center">
-      <a
+      <!-- <a
         href="#"
         class="text-base sm:text-lg font-semibold mr-2 sm:mr-5 text-gray-900 hover:text-teal-600"
         >Game list</a
@@ -17,7 +17,7 @@
         href="#"
         class="text-base sm:text-lg font-semibold mr-2 sm:mr-5 text-gray-900 hover:text-teal-600"
         >How to play</a
-      >
+      > -->
     </div>
   </div>
 </template>
