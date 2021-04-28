@@ -32,8 +32,24 @@ export default defineComponent({
     Chat,
     RoundAnnouncer,
     ScoreAnnouncer,
+    WordSelector: defineAsyncComponent({
+      loader: () => import("@/components/Games/WordSelector.vue"),
+      loadingComponent: GameLoader,
+    }),
     Shuffler: defineAsyncComponent({
       loader: () => import("@/components/Games/Shuffler.vue"),
+      loadingComponent: GameLoader,
+    }),
+    Riddles: defineAsyncComponent({
+      loader: () => import("@/components/Games/Riddles.vue"),
+      loadingComponent: GameLoader,
+    }),
+    Guess: defineAsyncComponent({
+      loader: () => import("@/components/Games/Guess.vue"),
+      loadingComponent: GameLoader,
+    }),
+    TurnAnnouncer: defineAsyncComponent({
+      loader: () => import("@/components/Games/TurnAnnouncer.vue"),
       loadingComponent: GameLoader,
     }),
   },

@@ -1,3 +1,4 @@
+import { RiddleData } from "./games/Riddles";
 import { Member, Members } from "./Party";
 import { Module, Mutation, VuexModule, Action } from "vuex-module-decorators";
 import router from "../../router";
@@ -27,6 +28,9 @@ interface RoomJoinedEvent {
   round?: number;
   scores?: { [payerId: string]: number };
 }
+interface ShufflerNewRoundData {
+  word: string;
+}
 
 export interface RoundScore {
   [playerName: string]: number;
@@ -55,10 +59,18 @@ export default class Room extends VuexModule {
 
   // word recived from the server that corresponds to the current word to be guessed
   word = "";
+  // the hint words that the current player can select one from to be the guess word
+  worldList: string[] = [];
+
+  // the guess hint recived by the current playing client for the GUESS game
+  guessHint = "";
+
   // the component to load in the game room. (RoundAnnouncer, GameComponentName, or ScoreAnnouncer)
-  component = "RoundAnnouncer";
+  component = "RoundAnnouncer"; // ? This is the prod correct value
   // component = "Shuffler"; // ! FIXME REMOVE THIS AFTER TESTING
   // component = "ScoreAnnouncer"; // ! FIXME REMOVE THIS AFTER TESTING
+  // component = "Guess"; // ! FIXME REMOVE THIS AFTER TESTING
+  // component = "Riddles"; // ! FIXME REMOVE THIS AFTER TESTING
 
   gameEnded = false;
 
@@ -81,7 +93,7 @@ export default class Room extends VuexModule {
   get getSettings(): RoomSettings {
     return this.settings;
   }
-
+  // time per round or turn
   get getTimePerRound(): number {
     return this.settings.timePerRound;
   }
@@ -93,6 +105,11 @@ export default class Room extends VuexModule {
   get getCurrentTime(): number {
     return this.currentTime;
   }
+
+  get getTimer(): number | null {
+    return this.timer;
+  }
+
   get getCurrentRound(): number {
     return this.currentRound;
   }
@@ -101,12 +118,24 @@ export default class Room extends VuexModule {
     return this.word;
   }
 
+  get getGuessHint(): string {
+    return this.guessHint;
+  }
+
+  get getWordList(): string[] {
+    return this.worldList;
+  }
+
   get getRoundScore(): PlayerScore[] | null {
     return this.roundScore;
   }
 
   get getGameEnded(): boolean {
     return this.gameEnded;
+  }
+
+  get getHasTurns(): boolean {
+    return this.gameId === 2;
   }
 
   /**
@@ -119,7 +148,7 @@ export default class Room extends VuexModule {
       : this.gameId == 2
       ? "Guess" // placeholder
       : this.gameId == 3
-      ? "Chance" // placeholder
+      ? "Riddles"
       : "Shuffler"; // default
   }
 
@@ -200,7 +229,6 @@ export default class Room extends VuexModule {
       this.currentTime--;
       if (this.currentTime == 0) {
         if (this.timer) clearInterval(this.timer);
-        console.log("timer stopped");
       }
       // console.log("timer is = ", this.currentTime);
     }, 1000);
@@ -209,11 +237,22 @@ export default class Room extends VuexModule {
   @Mutation
   STOP_TIMER(): void {
     if (this.timer) clearInterval(this.timer);
+    this.timer = null;
   }
 
   @Mutation
   SET_WORD(word: string): void {
     this.word = word;
+  }
+
+  @Mutation
+  SET_WORD_LIST(wordList: string[]): void {
+    this.worldList = wordList;
+  }
+
+  @Mutation
+  SET_HINT(hint: string): void {
+    this.guessHint = hint;
   }
 
   @Mutation
@@ -229,6 +268,8 @@ export default class Room extends VuexModule {
   /** Reset the whole round related data, to prepare for the next round */
   @Mutation
   RESET_ROUND_STATE(): void {
+    // reset the word to be guessed
+    this.word = "";
     // nullify the timer state
     this.timer = null;
     // reset the round timer
@@ -360,7 +401,8 @@ export default class Room extends VuexModule {
   // recived when a current player leaves the party
   @Action
   wsPlayerLeftParty(data: { playerId: string; newLeaderId?: string }) {
-    this.context.commit("REMOVE_PARTY_MEMBER", data.playerId);
+    // get playerUserName
+    this.context.dispatch("removePartyMember", data.playerId);
     // if the server sent a new leader id
     if (data.newLeaderId) {
       this.context.commit("SET_NEW_LEADER", data.newLeaderId);
@@ -394,16 +436,16 @@ export default class Room extends VuexModule {
   wsStartGame() {
     // load the Game.vue component by setting isLobby to false
     this.context.commit("SET_IS_LOBBY", false);
-    console.log("[Room.wsStartGame]GAME IS STARTING NOW!");
+    console.log("[Room.wsStartGame] GAME IS STARTING NOW!");
   }
 
   @Action
-  wsNewRound({ word }: { word: string }) {
+  wsNewRound(content: ShufflerNewRoundData | RiddleData) {
     // prepare for a new round by resetting all the state modified in the previous round
     this.context.commit("RESET_ROUND_STATE");
     // reset the state of the player and the whole party as having found the correct answer
     this.context.commit("RESET_PARTY_FOUND_ANSWER");
-    this.context.commit("RESET_PLAYER_FOUND_ANSWER");
+    this.context.commit("RESET_CLIENT_FOUND_ANSWER");
 
     const gameComponent = this.context.getters.getRoomComponent;
     // increment the round
@@ -412,11 +454,71 @@ export default class Room extends VuexModule {
     if (gameComponent != "RoundAnnouncer") {
       this.context.commit("SET_GAME_COMPONENT", "RoundAnnouncer");
     }
-
-    // set the hint word
-    this.context.commit("SET_WORD", word);
     // reset the round score after displaying them in the previous round
     this.context.commit("RESET_ROUND_SCORE");
+
+    // if the object is not empty
+    if (Object.keys(content).length) {
+      // set the hint word/ riddle
+      if (this.context.getters.getGameId == 3) {
+        this.context.commit("SET_RIDDLE", content);
+      } else {
+        const shuffledWord = content as ShufflerNewRoundData;
+        this.context.commit("SET_WORD", shuffledWord.word);
+
+        // this.context.commit("SET_RIDDLE", word);
+      }
+    }
+  }
+
+  /** TURN RELATED ACTIONS */
+
+  @Action
+  wsNewTurn({ playerId }: { playerId: string }) {
+    // prepare for a new turn by resetting all the state modified in the previous turn
+    this.context.commit("RESET_ROUND_STATE");
+    // reset the state of the player and the whole party as having found the correct answer
+    this.context.commit("RESET_PARTY_FOUND_ANSWER");
+    this.context.commit("RESET_CLIENT_FOUND_ANSWER");
+    // reset the isTurn state of the party member who previously played
+    this.context.commit("RESET_LAST_PLAYER_TURN_STATE");
+
+    // *---------------------------------------------------------------
+    // set the the current player in the party object
+    this.context.commit("SET_PARTY_CURRENT_PLAYER_TURN", playerId);
+    // get the current player's name whose turn is currently ongoing
+    // const currentPlayerName: string = this.context.rootGetters.getParty[
+    //   playerId
+    // ].username;
+
+    this.context.commit("SET_CURRENT_TURN_PLAYER_ID", playerId);
+    this.context.commit("SET_GAME_COMPONENT", "TurnAnnouncer");
+  }
+
+  @Action
+  wsWordSelect({ wordList }: { wordList?: string[] }) {
+    // only the current player will receive the wordList
+    if (wordList) {
+      this.context.commit("SET_WORD_LIST", wordList);
+    }
+
+    this.context.commit("SET_GAME_COMPONENT", "WordSelector");
+  }
+
+  @Action
+  wsWordToGuessLen({ wordLen }: { wordLen: number }) {
+    // display dashes according to the received word length
+    let hintDashes = "";
+    for (let i = 0; i < wordLen; i++) {
+      hintDashes += "-";
+    }
+    this.context.commit("SET_WORD", hintDashes);
+  }
+
+  @Action
+  wsHintReceived({ hint }: { hint: string }) {
+    //
+    this.context.commit("SET_HINT", hint);
   }
 
   @Action

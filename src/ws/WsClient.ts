@@ -2,9 +2,12 @@ import { EventDispatcher } from "./EventDispatcher";
 import { Store } from "vuex";
 import router from "@/router";
 
+import { server as serverConfig } from "@/config/settings";
+
+// removed from below interface
+// host: string;
+// port: number | undefined;
 interface InitConnectionOptions {
-  host: string;
-  port: number;
   path: "create" | "join";
   params: {
     username: string;
@@ -22,6 +25,9 @@ interface MessageFormat {
   phase?: number;
   remainingTime?: number;
   round?: number;
+  wordList?: string[];
+  wordLen?: number;
+  riddle?: string;
 }
 
 interface SnackOptions {
@@ -33,8 +39,11 @@ export class WsClient {
   private _ws: WebSocket | null = null;
   private url = "";
   private _eventDispatch!: EventDispatcher;
+  // whether the client successfully established a ws connection
+  private _connectSuccess = false;
 
   /** eslint-disable-line @typescript-eslint/no-explicit-any */
+  // eslint-disable-next-line
   constructor(private _store: Store<any>) {}
   get ws(): WebSocket {
     if (!this._ws) throw new Error("Websocket not initialized");
@@ -49,9 +58,13 @@ export class WsClient {
    * initialize the connection to the websocket server.
    */
   public initConnection(options: InitConnectionOptions): void {
-    const { host, port, path, params } = options;
-
-    this.url = `ws://${host}:${port}/${path}?username=${params.username}&id=${params.id}`;
+    const { path, params } = options;
+    // if (process.env.NODE_ENV && process.env.NODE_ENV === "production") {
+    //   this.url = `wss://${host}/${path}?username=${params.username}&id=${params.id}`;
+    // } else {
+    //   this.url = `ws://localhost:9001/${path}?username=${params.username}&id=${params.id}`;
+    // }
+    this.url = `${serverConfig.wsProtocol}://${serverConfig.host}/${path}?username=${params.username}&id=${params.id}`;
 
     // exception handler
     try {
@@ -64,6 +77,7 @@ export class WsClient {
       this.onMessage();
     } catch (err) {
       console.error(err);
+      this._connectSuccess = false;
       throw new Error("Error while establishing connection to the server.");
     }
   }
@@ -104,6 +118,19 @@ export class WsClient {
         case "newRound":
           this._store.dispatch("wsNewRound", data);
           break;
+        // * new turn event
+        case "newTurn":
+          this._store.dispatch("wsNewTurn", data);
+          break;
+        case "wordSelect":
+          this._store.dispatch("wsWordSelect", data);
+          break;
+        case "wordLen":
+          this._store.dispatch("wsWordToGuessLen", data);
+          break;
+        case "hint":
+          this._store.dispatch("wsHintReceived", data); // hint
+          break;
         // * timer started EVENT
         case "timerStarted":
           this._store.dispatch("wsTimerStarted");
@@ -136,6 +163,7 @@ export class WsClient {
   private onOpen(): void {
     if (!this._ws) throw new Error("Websocket not initialized");
     this._ws.onopen = (/* event */) => {
+      this._connectSuccess = true;
       console.log("CONNECTION ESTABLISHED!" /*ev*/);
     };
   }
@@ -155,9 +183,12 @@ export class WsClient {
   private onClose(): void {
     if (!this._ws) throw new Error("Websocket not initialized");
     this._ws.onclose = err => {
+      const message = this._connectSuccess
+        ? "Disconnected from the server"
+        : "Could not connect to the server";
       // show snackbar
       this.triggerSnack({
-        message: "Disconnected from the server",
+        message,
         type: "error",
       });
       this._store.commit("SET_IS_BEGIN_LOADING", false);
@@ -186,54 +217,3 @@ export class WsClient {
     });
   }
 }
-
-// decorator test
-// function checkWs(target: any, key: string, desc: PropertyDescriptor) {
-//   const method = desc.value;
-
-//   desc.value = function() {
-//     if (!target["ws"]) throw new Error("nope");
-//     method();
-//   };
-// }
-
-/* READYSTATE REFERENCE
-
-  0	CONNECTING	Socket has been created. The connection is not yet open.
-  1	OPEN	The connection is open and ready to communicate.
-  2	CLOSING	The connection is in the process of closing.
-  3	CLOSED	The connection is closed or couldn't be opened.
-
-
- *    onclose
-     |Status Code | Meaning         | Contact       | Reference |
-    -+------------+-----------------+---------------+-----------|
-     | 1000       | Normal Closure  | hybi@ietf.org | RFC 6455  |
-    -+------------+-----------------+---------------+-----------|
-     | 1001       | Going Away      | hybi@ietf.org | RFC 6455  |
-    -+------------+-----------------+---------------+-----------|
-     | 1002       | Protocol error  | hybi@ietf.org | RFC 6455  |
-    -+------------+-----------------+---------------+-----------|
-     | 1003       | Unsupported Data| hybi@ietf.org | RFC 6455  |
-    -+------------+-----------------+---------------+-----------|
-     | 1004       | ---Reserved---- | hybi@ietf.org | RFC 6455  |
-    -+------------+-----------------+---------------+-----------|
-     | 1005       | No Status Rcvd  | hybi@ietf.org | RFC 6455  |
-    -+------------+-----------------+---------------+-----------|
-     | 1006       | Abnormal Closure| hybi@ietf.org | RFC 6455  |
-    -+------------+-----------------+---------------+-----------|
-     | 1007       | Invalid frame   | hybi@ietf.org | RFC 6455  |
-     |            | payload data    |               |           |
-    -+------------+-----------------+---------------+-----------|
-     | 1008       | Policy Violation| hybi@ietf.org | RFC 6455  |
-    -+------------+-----------------+---------------+-----------|
-     | 1009       | Message Too Big | hybi@ietf.org | RFC 6455  |
-    -+------------+-----------------+---------------+-----------|
-     | 1010       | Mandatory Ext.  | hybi@ietf.org | RFC 6455  |
-    -+------------+-----------------+---------------+-----------|
-     | 1011       | Internal Server | hybi@ietf.org | RFC 6455  |
-     |            | Error           |               |           |
-    -+------------+-----------------+---------------+-----------|
-     | 1015       | TLS handshake   | hybi@ietf.org | RFC 6455  |
-    -+------------+-----------------+---------------+-----------|
- */

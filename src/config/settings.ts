@@ -11,8 +11,8 @@ export const gameOptions = [
   },
   {
     id: 3,
-    value: "Chance",
-    selectable: false,
+    value: "Riddles",
+    selectable: true,
   },
 ];
 export const difficulty = {

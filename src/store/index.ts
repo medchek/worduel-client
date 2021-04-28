@@ -3,6 +3,7 @@ import UserInterfaceModule from "./modules/UI";
 import Room from "./modules/Party";
 import Party from "./modules/Room";
 import Chat from "./modules/Chat";
+import Riddles from "./modules/games/Riddles";
 
 export default createStore({
   modules: {
@@ -10,6 +11,7 @@ export default createStore({
     Room,
     Party,
     Chat,
+    Riddles,
   },
   actions: {
     /** Reset the whole store to its default state*/
