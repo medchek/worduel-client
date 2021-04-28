@@ -23,4 +23,20 @@ export class EventDispatcher {
   public answer(answer: string): void {
     this.ws.send(JSON.stringify({ event: "answer", answer }));
   }
+
+  /**
+   * send the current player selected word to the server
+   * @param index the index of the selected word
+   */
+  public wordSelected(index: number): void {
+    this.ws.send(JSON.stringify({ event: "wordSelected", idx: index }));
+  }
+
+  /**
+   * send the hint to the other players in the room
+   * @param hint the hint contents
+   */
+  public sendHint(hint: string): void {
+    this.ws.send(JSON.stringify({ event: "hint", hint }));
+  }
 }
