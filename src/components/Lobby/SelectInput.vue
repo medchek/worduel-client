@@ -1,9 +1,7 @@
 <template>
-  <div
-    class="h-full flex-grow flex items-center relative text-gray-800 mr-18"
-    @click="openSelect"
-  >
+  <div class="flex h-full w-full flex-grow items-center relative text-gray-800">
     <input
+      @click="openSelect"
       :id="id"
       class="select-input pl-6 text-lg font-bold w-full h-full bg-white rounded-lg cursor-pointer ring-teal-200"
       readonly
@@ -19,23 +17,24 @@
     >
       <app-icon :icon="mdiChevronDown" :size="40" ca />
     </div>
+    <select-drop
+      @optionSelected="selectOption($event)"
+      @closeSelectInput="closeSelect"
+      :currentlySelectedIndex="currentlySelectedIndex"
+      :options="options"
+      v-if="show"
+    />
   </div>
   <!-- -->
-  <select-drop
-    @optionSelected="selectOption($event)"
-    @closeSelectInput="closeSelect"
-    :currentlySelectedIndex="currentlySelectedIndex"
-    :options="options"
-    v-if="show"
-  />
 </template>
 
 <script>
-import { ref, defineAsyncComponent, computed } from "vue";
+import { ref, /*defineAsyncComponent,*/ computed } from "vue";
 import { mdiChevronDown } from "@mdi/js";
 import { defineComponent } from "vue";
 
 import AppIcon from "../AppIcon";
+import SelectDrop from "@/components/Lobby/SelectDrop";
 
 export default defineComponent({
   props: {
@@ -64,7 +63,7 @@ export default defineComponent({
   },
   emits: ["idSelected"],
   components: {
-    SelectDrop: defineAsyncComponent(() => import("./SelectDrop.vue")),
+    SelectDrop,
     AppIcon,
   },
   setup(props, { emit }) {
@@ -93,7 +92,7 @@ export default defineComponent({
       currentlySelectedIndex.value = optionIndex;
       // emit parent component
       emit("idSelected", props.options[optionIndex].id);
-      show.value = false;
+      closeSelect();
     };
     // display value + appendText (if any)
     const completeDisplayValue = computed(() => {

@@ -2,7 +2,7 @@
   <div
     id="drop-down"
     ref="selectDropRef"
-    class="absolute z-10 max-h-60 overflow-y-auto left-60 right-0 mr-18 bg-white shadow-lg rounded-t-lg rounded-b-md flex flex-col text-gray-800"
+    class="absolute z-50 max-h-60 overflow-y-auto left-0 right-0 bg-white shadow-xl rounded-t-lg rounded-b-md flex flex-col text-gray-800"
     :class="[isOutOfScreen ? 'bottom-0' : 'top-0']"
   >
     <select-option
@@ -60,8 +60,9 @@ export default defineComponent({
 
     onMounted(() => {
       // the settimeout will prevent the click outside event from removing the component right after render
-      setTimeout(() => {
+      const show = setTimeout(() => {
         document.addEventListener("click", onSelectDropClickOutside);
+        clearTimeout(show);
       }, 10);
       if (
         selectDropRef.value.getBoundingClientRect().bottom >

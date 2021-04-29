@@ -1,8 +1,12 @@
 <template>
-  <div class="flex flex-col w-full relative mb-8">
-    <div class="flex h-10 2xl:h-14 items-center w-full">
+  <div class="flex flex-col w-full relative mb-5 md:mb-8">
+    <div
+      class="flex h-20 md:h-16 2xl:h-14 w-full flex-col md:flex-row items-start md:items-center"
+    >
       <!-- LABEL DIV -->
-      <div class="text-gray-800 text-lg 2xl:text-xl font-bold w-60">
+      <div
+        class="text-gray-800 text-lg 2xl:text-xl font-bold w-36 md:w-44 lg:w-60"
+      >
         <label for="select-game" class="capitalize">{{ label }}</label>
       </div>
       <!-- INPUT -->

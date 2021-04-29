@@ -12,11 +12,14 @@
     <!-- Setting base -->
     <div id="settings-base" class="flex flex-col w-full px-4 py-2 flex-grow">
       <!-- TEXT -->
-      <p class="text-lg 2xl:text-xl text-gray-500 font-semibold">
+      <p class="text-sm md:text-lg 2xl:text-xl text-gray-500 font-semibold">
         Give this link to your friends so they can join you
       </p>
-      <!--  INPUT SECTION -->
-      <div id="link-input" class="flex w-full h-10 2xl:h-14 my-2">
+      <!--  GAME ROOM URL INPUT SECTION -->
+      <section
+        id="link-input-section"
+        class="flex flex-col md:flex-row w-full h-20 md:h-14 my-2"
+      >
         <input
           id="game-url"
           type="text"
@@ -29,18 +32,19 @@
             }
           "
           :value="roomUrl"
-          class="flex-grow h-full rounded-lg 2xl:rounded-xl pl-4 text-teal-400 font-bold text-xl focus:ring-2 focus:ring-teal-200 shadow-sm"
+          class="flex-grow h-12 md:h-full rounded-lg 2xl:rounded-xl pl-2 md:pl-4 text-teal-400 font-bold text-base md:text-xl focus:ring-2 focus:ring-teal-200 shadow-sm mb-2 md:mb-0"
         />
         <button
           title="copy to clipboard"
-          class="ml-4 w-10 2xl:w-14 rounded-lg 2xl:rounded-xl bg-white h-full text-gray-800 focus:ring-teal-200 focus:bg-gray-800 focus:text-white shadow-sm"
+          class="ml-0 md:ml-2 lg:ml-4 w-full md:w-14 h-10 md:h-full bg-white text-gray-800 focus:ring-teal-200 focus:bg-gray-800 focus:text-white shadow-sm rounded-md md:rounded-lg 2xl:rounded-xl"
           @click="copyGameLink"
         >
           <app-icon :icon="mdiContentCopy" />
+          <span class="md:hidden font-bold">copy</span>
         </button>
-      </div>
+      </section>
       <!-- HORIZONTAL LINE -->
-      <hr class="border-none h-0.5 bg-teal-300 my-4 opacity-25" />
+      <hr class="border-none h-0.5 bg-teal-300 my-2 md:my-4 opacity-25" />
       <!-- SELECTS FROM -->
       <div id="select-form" class="flex flex-col flex-grow">
         <lobby-setting label="selected game" :options="gameOptions" />
@@ -76,7 +80,7 @@
         v-if="player.isLeader"
         :loading="isBtnLoading"
         @click="requestGameStart"
-        class="w-1/3 2xl:w-5/12 h-12 2xl:h-14 bg-gray-800 mx-auto text-white rounded-lg text-xl xl:text-2xl font-bold hover:bg-gray-900 transition-colors duration-150 focus:ring-4 ring-teal-300"
+        class="w-10/12 md:w-1/3 2xl:w-5/12 h-12 2xl:h-14 bg-gray-800 mx-auto text-white rounded-lg text-xl xl:text-2xl font-bold hover:bg-gray-900 transition-colors duration-150 focus:ring-4 ring-teal-300"
       >
         start
       </app-button>
