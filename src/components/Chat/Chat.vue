@@ -1,10 +1,12 @@
 <template>
   <section
-    class="flex flex-col w-56 xl:w-60 2xl:w-72 shadow-lg rounded-t-lg overflow-hidden"
+    id="chat"
+    class="flex flex-col w-full md:w-48 lg:w-56 xl:w-60 2xl:w-72 md:h-auto md:shadow-lg md:rounded-t-lg overflow-hidden"
+    :class="[showChat ? 'h-60' : 'h-auto ']"
   >
     <!-- SECTION CHAT HEADER -->
     <h1
-      class="flex items-center text-xl 2xl:text-2xl font-bold bg-gray-900 text-gray-100 h-12 2xl:h-14 pl-3"
+      class="hidden md:flex items-center text-lg lg:text-xl 2xl:text-2xl font-bold bg-gray-900 text-gray-100 md:pl-4 h-10 lg:h-12 2xl:h-14"
     >
       Chat
     </h1>
@@ -12,24 +14,26 @@
     <!-- 200 -->
     <div
       id="chat-display"
-      class="flex flex-col justify-end w-full rounded-b-sm h-full bg-gray-200"
+      class="flex flex-col justify-end w-full h-full md:rounded-b-sm"
+      :class="[showChat && 'bg-bgray-100 border-t-2 border-gray-200']"
     >
       <!-- SECTION CHAT MESSAGES -->
       <div
         id="chat-messages"
         ref="chatRef"
+        v-if="showChat"
         class="flex-grow overflow-y-auto flex flex-col-reverse text-sm 2xl:text-base"
       >
         <div
           v-for="message in chat"
           :key="message.id"
-          class="px-2 py-1 my-0.25"
+          class="px-1.5 py-1 lg:py-1.5 mb-0.5 mx-3 rounded-md"
           :class="[
-            message.type == 1
-              ? 'bg-white text-teal-500 '
-              : message.type == 3
-              ? 'bg-red-100'
-              : 'hover:bg-white',
+            message.type == 1 // FOUND ANSWER
+              ? 'bg-gradient-to-br from-white to-teal-100 text-teal-500 '
+              : message.type == 3 // RATE LIMITER
+              ? ' bg-gradient-to-br from-red-50 to-red-200'
+              : 'hover:bg-white', // REGULAR STATE
           ]"
         >
           <!--        
@@ -69,18 +73,19 @@
       <div
         v-if="renderChatInput"
         id="chat-input"
-        class="h-18 2xl:h-18 px-2 pt-2 mt-1 border-t border-gray-500 border-opacity-40 bg-gray-300"
+        class="h-auto 2xl:h-18 px-2 pt-2 mt-1 md:border-t md:border-gray-300 border-opacity-40 bg-gray-300 bg-opacity-50"
       >
         <!-- INPUT EL  -->
         <form @submit.prevent="answer">
           <input
-            v-model="inputMessage"
+            :value="inputMessage"
+            @input="$event => (inputMessage = $event.target.value)"
             placeholder="Type your answer..."
             maxlength="100"
             spellcheck="false"
             autocomplete="off"
             id="answer-input"
-            class="h-12 2xl:h-12 w-full rounded-t-lg border-b-4 border-teal-400 ring-teal-200 pl-2 focus:border-teal-500 bg-gray-100 focus:bg-white text-gray-800 2xl:text-lg"
+            class="h-12 w-full rounded-t-lg border-b-4 border-teal-400 ring-teal-200 pl-2 focus:border-teal-500 bg-gray-100 focus:bg-white text-gray-800 2xl:text-lg"
           />
           <div
             class="h-4 text-xs text-right text-gray-600"
@@ -165,6 +170,7 @@ export default defineComponent({
       answer,
       renderChatInput,
       chatRef,
+      showChat: computed(() => store.getters.getShowChat),
     };
   },
 });

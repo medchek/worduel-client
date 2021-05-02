@@ -1,16 +1,26 @@
 <template>
   <section
     id="room-settings"
-    class="flex flex-col flex-grow bg-gray-200 ml-2 rounded-t-lg overflow-hidden"
+    class="flex flex-col flex-grow rounded-t-lg md:overflow-hidden md:ml-2"
   >
+    <!-- PARTY OPEN BTN -->
+    <!-- <button
+      class="md:hidden w-full h-10 bg-bgray-100 text-gray-800 mb-2 md:my-0 rounded-md font-bold shadow-md"
+    >
+      <app-icon :icon="mdiAccountGroup" />
+      <span class="ml-2">Party</span>
+    </button> -->
     <!-- Setting Header -->
     <h1
-      class="flex items-center pl-4 text-xl 2xl:text-2xl bg-gray-800 text-gray-50 h-12 2xl:h-16"
+      class="flex items-center justify-start pl-4 text-lg md:text-xl 2xl:text-2xl bg-gray-800 text-gray-50 h-10 md:h-12 2xl:h-16 rounded-t-lg"
     >
       Room settings
     </h1>
     <!-- Setting base -->
-    <div id="settings-base" class="flex flex-col w-full px-4 py-2 flex-grow">
+    <div
+      id="settings-base"
+      class="flex flex-col w-full px-4 py-2 flex-grow bg-gray-200"
+    >
       <!-- TEXT -->
       <p class="text-sm md:text-lg 2xl:text-xl text-gray-500 font-semibold">
         Give this link to your friends so they can join you
@@ -18,7 +28,7 @@
       <!--  GAME ROOM URL INPUT SECTION -->
       <section
         id="link-input-section"
-        class="flex flex-col md:flex-row w-full h-20 md:h-14 my-2"
+        class="flex flex-col md:flex-row w-full h-auto md:h-12 2xl:h-14 my-2"
       >
         <input
           id="game-url"
@@ -32,21 +42,25 @@
             }
           "
           :value="roomUrl"
-          class="flex-grow h-12 md:h-full rounded-lg 2xl:rounded-xl pl-2 md:pl-4 text-teal-400 font-bold text-base md:text-xl focus:ring-2 focus:ring-teal-200 shadow-sm mb-2 md:mb-0"
+          class="flex-grow h-10 md:h-full rounded-lg 2xl:rounded-xl pl-2 md:pl-4 text-teal-400 font-bold text-base md:text-xl focus:ring-2 focus:ring-teal-200 shadow-sm mb-2 md:mb-0"
         />
+        <!-- COPY BTN -->
         <button
           title="copy to clipboard"
-          class="ml-0 md:ml-2 lg:ml-4 w-full md:w-14 h-10 md:h-full bg-white text-gray-800 focus:ring-teal-200 focus:bg-gray-800 focus:text-white shadow-sm rounded-md md:rounded-lg 2xl:rounded-xl"
+          class="ml-0 md:ml-2 lg:ml-4 w-full md:w-14 h-8 md:h-full bg-white text-gray-800 focus:ring-teal-200 active:bg-gray-800 active:text-white shadow-sm rounded-md md:rounded-lg 2xl:rounded-xl"
           @click="copyGameLink"
         >
           <app-icon :icon="mdiContentCopy" />
-          <span class="md:hidden font-bold">copy</span>
+          <span class="md:hidden font-bold ml-0.5">{{ copyText }}</span>
         </button>
       </section>
       <!-- HORIZONTAL LINE -->
-      <hr class="border-none h-0.5 bg-teal-300 my-2 md:my-4 opacity-25" />
+      <hr class="border-none h-0.5 bg-teal-300 mt-1 md:mt-2 opacity-25" />
       <!-- SELECTS FROM -->
-      <div id="select-form" class="flex flex-col flex-grow">
+      <div
+        id="select-form"
+        class="flex items-center flex-col flex-grow pt-2 h-20 border-b-2 border-bgray-400 border-opacity-60 mb-2 sm:border-b-0 md:mb-0 sm:h-auto overflow-y-auto md:overflow-y-visible px-1 md:px-0"
+      >
         <lobby-setting label="selected game" :options="gameOptions" />
 
         <lobby-setting
@@ -80,14 +94,14 @@
         v-if="player.isLeader"
         :loading="isBtnLoading"
         @click="requestGameStart"
-        class="w-10/12 md:w-1/3 2xl:w-5/12 h-12 2xl:h-14 bg-gray-800 mx-auto text-white rounded-lg text-xl xl:text-2xl font-bold hover:bg-gray-900 transition-colors duration-150 focus:ring-4 ring-teal-300"
+        class="w-full md:w-1/2 2xl:w-5/12 h-12 2xl:h-14 bg-gray-800 mx-auto text-white rounded-lg text-xl xl:text-2xl font-bold hover:bg-gray-900 transition-colors duration-150 focus:ring-4 ring-teal-300"
       >
         start
       </app-button>
       <!-- not leader display-->
       <div
         v-else
-        class="flex justify-center items-center w-1/2 h-10 2xl:h-14 bg-gray-300 mx-auto text-gray-500 rounded-md text-lg 2xl:text-xl cursor-default font-bold"
+        class="flex justify-center items-center w-full sm:w-1/2 md:w-3/5 h-10 md:h-12 2xl:h-14 bg-gray-300 mx-auto text-gray-500 rounded-md text-sm md:text-base lg:text-lg 2xl:text-xl cursor-default font-bold"
       >
         Waiting for {{ leaderName }} to start the game
       </div>
@@ -96,8 +110,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, inject, ref, computed } from "vue";
-import { mdiContentCopy } from "@mdi/js";
+import { defineComponent, inject, ref, computed, onUnmounted } from "vue";
+import { mdiContentCopy, mdiAccountGroup } from "@mdi/js";
 
 import { useStore } from "vuex";
 import { WsClient } from "@/ws/WsClient";
@@ -143,11 +157,19 @@ export default defineComponent({
     };
 
     const linkInputRef = ref<HTMLInputElement | null>(null);
+    const copyText = ref<string>("copy");
+    let revertCopyText: number | null = null;
 
     const copyGameLink = () => {
       if (linkInputRef.value) {
         linkInputRef.value.select();
         linkInputRef.value.setSelectionRange(0, 99999);
+
+        if (revertCopyText) clearInterval(revertCopyText);
+        copyText.value = "copied!";
+        revertCopyText = setTimeout(() => {
+          copyText.value = "copy";
+        }, 1000);
         try {
           document.execCommand("copy");
         } catch (err) {
@@ -155,6 +177,10 @@ export default defineComponent({
         }
       }
     };
+    onUnmounted(() => {
+      if (revertCopyText) clearTimeout(revertCopyText);
+    });
+
     const settings = computed(() => store.getters.getSettings);
     const player = computed(() => store.getters.getPlayer);
     const startBtnTitle = computed(() => {
@@ -182,9 +208,15 @@ export default defineComponent({
           message: "More players are needed to start the game",
         });
       }
+
+      // open party btn
+      // const showPartyPanel = false;
     };
     return {
+      // icons
       mdiContentCopy,
+      mdiAccountGroup,
+      //
       settings,
       gameOptions,
       difficulty,
@@ -192,6 +224,7 @@ export default defineComponent({
       timePerRound,
       linkInputRef,
       copyGameLink,
+      copyText,
       roomUrl,
       difficultySelected,
       roundSelected,

@@ -1,19 +1,17 @@
 <template>
-  <div ref="timerEl" class="w-full h-full flex justify-center overflow-hidden">
-    <svg width="100%">
-      <circle class="timer-base" stroke-width="15" cy="50%" cx="50%" r="33%" />
-      <circle
-        class="timer"
-        stroke-width="15"
-        cy="50%"
-        cx="50%"
-        r="33%"
-        :stroke-dasharray="dashArray + '%'"
-        :stroke-dashoffset="dashOffset + '%'"
-      />
-    </svg>
-    <!-- <slot></slot> -->
-  </div>
+  <svg>
+    <!-- <circle class="timer-base" cy="50%" cx="50%" r="33%" /> -->
+    <circle
+      class="timer"
+      cy="50%"
+      cx="50%"
+      r="33%"
+      :stroke-dasharray="dashArray + '%'"
+      :stroke-dashoffset="dashOffset + '%'"
+    />
+    test
+  </svg>
+  <!-- <slot></slot> -->
 </template>
 
 <script lang="ts">

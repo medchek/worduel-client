@@ -1,9 +1,11 @@
 import { Module, Mutation, VuexModule, Action } from "vuex-module-decorators";
+// mocks
+// import { chat } from "./../../__tests__/mocks/store";
 export interface ChatMessage extends MessageData {
   id: number;
 }
 interface MessageData {
-  playerId: string; // used to uniquely identify the player that found the correct answer and display the check mark and stop the timer for him/her
+  playerId?: string; // used to uniquely identify the player that found the correct answer and display the check mark and stop the timer for him/her
   from?: string; // player id
   message?: string; // if the type number is 1, the message property is undefined and is always "playerid has found the answer",
   type: number; // undefined = regular. 1 = just found correct answer, 2 = already answered, 3 = rate limiter slow down, 4 = player has disconnected
@@ -11,29 +13,8 @@ interface MessageData {
 
 @Module
 export default class Party extends VuexModule {
-  chat: ChatMessage[] = [
-    // {
-    //   id: 1,
-    //   message: "test one",
-    //   type: 0,
-    //   from: "roleqx",
-    // },
-    // {
-    //   id: 2,
-    //   type: 1,
-    //   from: "dopemaryjane",
-    // },
-    // {
-    //   id: 3,
-    //   message: "I've already found the answer",
-    //   type: 2,
-    //   from: "therapy",
-    // },
-    // {
-    //   id: 4,
-    //   type: 3,
-    // },
-  ];
+  // chat: ChatMessage[] = [...chat];
+  chat: ChatMessage[] = [];
 
   get getChat(): ChatMessage[] {
     return this.chat;

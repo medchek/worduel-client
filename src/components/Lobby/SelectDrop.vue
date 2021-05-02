@@ -2,7 +2,7 @@
   <div
     id="drop-down"
     ref="selectDropRef"
-    class="absolute z-50 max-h-60 overflow-y-auto left-0 right-0 bg-white shadow-xl rounded-t-lg rounded-b-md flex flex-col text-gray-800"
+    class="absolute z-50 max-h-48 sm:max-h-60 left-0 right-0 bg-white shadow-lg rounded-t-lg rounded-md sm:rounded-b-md flex flex-col text-gray-800 border-2 border-bgray-300"
     :class="[isOutOfScreen ? 'bottom-0' : 'top-0']"
   >
     <select-option

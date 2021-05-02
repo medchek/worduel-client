@@ -1,21 +1,25 @@
 <template>
-  <div class="w-full flex flex-col items-center">
+  <div class="w-full flex flex-col items-center justify-center h-full">
     <h1
-      class="text-4xl lg:text-5xl 2xl:text-6xl font-bold text-gray-800 text-center"
+      class="text-2xl sm:text-4xl lg:text-5xl 2xl:text-6xl font-bold text-gray-800 text-center"
     >
       Enter a name to join your friends
     </h1>
     <div
       id="join-base"
-      class="flex flex-col justify-center items-center w-11/12 bg-gray-100 py-10 rounded-md mt-10 mb-20 px-4"
+      class="flex flex-col justify-center items-center w-full md:w-3/4 bg-gray-100 py-10 rounded-md mt-2 md:mt-10 mb-20 px-4"
     >
-      <app-input
-        :error="errorMessage"
-        v-model:value="username"
-        @update:username="username = $event"
-        spellcheck="false"
-        @keydown.enter="join"
-      />
+      <div class="w-full mb-4">
+        <app-input
+          :error="errorMessage"
+          v-model:value="username"
+          @update:username="username = $event"
+          spellcheck="false"
+          @keydown.enter="join"
+          className="bg-gray-300 focus:bg-gray-50"
+          :autofocus="true"
+        />
+      </div>
       <button
         class="w-60 2xl:w-80 h-12 2xl:h-16 bg-teal-400 hover:bg-teal-500 focus:bg-gray-800 text-white text-2xl 2xl:text-3xl font-bold rounded-lg ring-teal-300"
         @click="join"

@@ -1,9 +1,11 @@
 <template>
-  <div class="flex h-full w-full flex-grow items-center relative text-gray-800">
+  <div
+    class="flex h-full w-full flex-grow items-center relative text-gray-800 bg-transparent"
+  >
     <input
       @click="openSelect"
       :id="id"
-      class="select-input pl-6 text-lg font-bold w-full h-full bg-white rounded-lg cursor-pointer ring-teal-200"
+      class="select-input pl-6 text-lg font-bold w-full h-full rounded-lg cursor-pointer ring-teal-200"
       readonly
       :value="completeDisplayValue"
       aria-readonly

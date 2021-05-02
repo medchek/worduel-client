@@ -2,7 +2,7 @@
   <div class="flex justify-center items-center w-7 h-full">
     <!-- outer circle -->
     <div
-      class="flex justify-center items-center w-4 h-4 border-2 rounded-full border-gray-800"
+      class="flex justify-center items-center w-3 h-3 lg:w-4 lg:h-4 border-2 rounded-full border-gray-800"
     >
       <!-- inner circle -->
       <div

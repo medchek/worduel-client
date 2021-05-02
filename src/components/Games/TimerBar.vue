@@ -1,19 +1,24 @@
 <template>
-  <div
+  <!-- <div
     id="progress-timer-base"
     class="flex flex-col justify-center mt-auto w-full h-4 md:h-6 2xl:h-8 bg-gray-300 relative rounded-b-md overflow-hidden"
+  > -->
+  <div
+    id="progress-timer-base"
+    class="flex flex-col justify-center bg-gray-300 relative"
   >
     <div
       id="progress-timer-backgournd"
-      class="absolute w-full text-xl 2xl:text-2xl text-white z-10 text-center"
+      class="absolute w-full text-white z-10 text-center"
     >
       {{ currentTime }}s
     </div>
     <div
       id="progress-timer-overlay"
       :style="{ width: progress }"
-      class="h-full bg-gradient-to-r from-teal-300 to-teal-500 absolute transition-all"
+      class="h-full bg-teal-400 absolute transition-all"
     ></div>
+    <!--  bg-gradient-to-r from-teal-300 to-teal-500-->
   </div>
 </template>
 

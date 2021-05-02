@@ -1,8 +1,12 @@
 <template>
   <!-- <div class="w-full flex items-stretch my-3 px-2 justify-between"> -->
-  <div class="w-full flex items-stretch justify-between">
+  <div
+    class="w-full flex flex-col md:flex-row items-stretch justify-between md:p-2"
+  >
+    <!-- <transition name="slide"> -->
     <party />
-    <section class="flex flex-col items-center flex-grow">
+    <!-- </transition> -->
+    <section class="flex flex-col items-center flex-grow transition-all">
       <transition name="scale" mode="out-in">
         <component :is="roomComponent" />
       </transition>
@@ -66,5 +70,18 @@ export default defineComponent({
 .scale-enter-from,
 .scale-leave-to {
   transform: scale(0);
+}
+
+.slide-enter-active,
+.scale-leave-active {
+  /* transform: scale(0); */
+  opacity: 1;
+  transition: all 0.3s ease;
+}
+
+.slide-enter-from,
+.scale-leave-to {
+  opacity: 0;
+  transform: translateY(-50%);
 }
 </style>

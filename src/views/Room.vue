@@ -1,9 +1,13 @@
 <template>
-  <div class="w-full flex items-stretch my-3 px-2 justify-between">
-    <lobby v-if="isLobby" />
+  <div
+    v-if="isLobby"
+    class="w-full flex flex-col flex-grow h-full md:flex-row md:items-stretch md:my-2 md:px-2 justify-between"
+  >
+    <!-- <lobby v-if="isLobby" /> -->
+    <lobby />
     <!-- players list -->
-    <game v-else />
   </div>
+  <game v-else />
 </template>
 
 <script lang="ts">

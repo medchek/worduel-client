@@ -3,10 +3,12 @@
     id="game-announcer"
     class="flex flex-col flex-grow w-full text-gray-800 font-bold justify-center items-center"
   >
-    <p class="text-5xl 2xl:text-6xl">Round {{ currentRound }}</p>
+    <p class="text-3xl md:text-4xl lg:text-5xl 2xl:text-6xl">
+      Round {{ currentRound }}
+    </p>
     <p
       v-if="getReady && !hasTurns"
-      class="text-3xl text-teal-500 font-normal transition-all duration-300"
+      class="text-xl lg:text-3xl text-teal-500 font-normal transition-all duration-300"
     >
       Get ready!
     </p>

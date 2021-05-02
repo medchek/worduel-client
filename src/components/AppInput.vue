@@ -1,17 +1,26 @@
 <template>
-  <div class="flex flex-col w-full lg:w-3/5 h-20 2xl:h-24 text-left mx-auto">
+  <div class="flex flex-col w-full h-14 sm:h-26 md:h-18 mx-auto">
     <input
-      placeholder="Enter a nickname"
+      :placeholder="placeholder"
+      :spellcheck="spellcheck"
+      :autofocus="autofocus"
       :value="value"
       @input="updateValue($event.target.value)"
-      class="app-input h-20 2xl:h-24 w-full bg-gray-300 bg-opacity-50 rounded-t-xl border-b-4 border-gray-800 focus:outline-none px-4 text-xl 2xl:text-2xl focus:bg-opacity-100 font-bold ring-teal-100"
+      class="flex-grow w-full rounded-t-xl border-b-4 2xl:border-b-6 focus:outline-none px-4 text-xl sm:text-2xl 2xl:text-3xl font-bold"
+      :class="[
+        error
+          ? 'border-red-600 app-input-error ring-red-200'
+          : 'border-gray-800 app-input  ring-teal-200',
+        className ? className : 'bg-gray-100 focus:bg-gray-50',
+      ]"
     />
-    <div
-      v-if="!noError"
-      class="text-red-500 font-semibold text-xs lg:text-sm 2xl:text-base h-10"
-    >
-      <span class="shake inline-block" v-if="error">{{ error }}</span>
-    </div>
+  </div>
+  <div
+    v-if="!noError"
+    class="text-left text-red-600 font-bold text-xs md:text-sm 2xl:text-base bg-red-100 mt-1 rounded py-1 px-2"
+    :class="{ hidden: !error }"
+  >
+    <span class="shake inline-block" v-if="error">{{ error }}</span>
   </div>
 </template>
 
@@ -26,11 +35,25 @@ export default defineComponent({
     value: {
       type: String,
     },
+    className: {
+      type: String,
+    },
     error: {
       type: String,
       default: "",
     },
     noError: {
+      type: Boolean,
+      default: false,
+    },
+    placeholder: {
+      type: String,
+    },
+    spellcheck: {
+      type: [Boolean, String],
+      default: false,
+    },
+    autofocus: {
       type: Boolean,
       default: false,
     },
@@ -62,6 +85,20 @@ export default defineComponent({
     border-color: #2d3748;
   }
 }
+.app-input-error:focus {
+  animation: flashBorderError 0.8s ease-in-out infinite;
+}
+@keyframes flashBorderError {
+  0% {
+    border-color: #7f1d1d;
+  }
+  50% {
+    border-color: #ef4444;
+  }
+  100% {
+    border-color: #7f1d1d;
+  }
+}
 @keyframes shake {
   0% {
     transform: scale(0);
@@ -83,7 +120,6 @@ export default defineComponent({
   }
   100% {
     transform: translateX(0);
-    color: red;
   }
 }
 </style>

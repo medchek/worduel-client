@@ -21,6 +21,10 @@ export default class UserInterface extends VuexModule {
     message: "",
   };
 
+  // TheHeader.vue sm && less
+  showChat = true;
+  showParty = true;
+
   get selectedGame(): number | null {
     return this.selectedGame;
   }
@@ -31,6 +35,25 @@ export default class UserInterface extends VuexModule {
 
   get getIsBeginLoading(): boolean {
     return this.isBeginLoading;
+  }
+
+  get getShowParty(): boolean {
+    return this.showParty;
+  }
+
+  get getShowChat(): boolean {
+    return this.showChat;
+  }
+
+  @Mutation
+  TOGGLE_PARTY() {
+    this.showParty = !this.showParty;
+  }
+
+  @Mutation
+  TOGGLE_CHAT() {
+    this.showChat = !this.showChat;
+    console.log(`[TOGGLE_CHAT] => current value = ${this.showChat}`);
   }
 
   @Mutation
